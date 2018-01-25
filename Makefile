@@ -13,7 +13,7 @@
 ifeq ($(CROSSCOMPILE),)
     # Not crosscompiling, so check that we're on Linux.
     ifneq ($(shell uname -s),Linux)
-        $(warning Elixir ALE only works on Linux, but crosscompilation)
+        $(warning Elixir PRU_MSG only works on Linux, but crosscompilation)
         $(warning is supported by defining $$CROSSCOMPILE, $$ERL_EI_INCLUDE_DIR,)
         $(warning and $$ERL_EI_LIBDIR. See Makefile for details. If using Nerves,)
         $(warning this should be done automatically.)
@@ -22,7 +22,7 @@ ifeq ($(CROSSCOMPILE),)
 	DEFAULT_TARGETS = priv
     endif
 endif
-DEFAULT_TARGETS ?= priv priv/ale
+DEFAULT_TARGETS ?= priv priv/pru_msg
 
 # Look for the EI library and header files
 # For crosscompiled builds, ERL_EI_INCLUDE_DIR and ERL_EI_LIBDIR must be
@@ -57,8 +57,8 @@ all: $(DEFAULT_TARGETS)
 priv:
 	mkdir -p priv
 
-priv/ale: $(OBJ)
+priv/pru_msg: $(OBJ)
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
 
 clean:
-	rm -f priv/ale src/*.o
+	rm -f priv/pru_msg src/*.o

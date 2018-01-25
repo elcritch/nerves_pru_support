@@ -19,7 +19,7 @@ defmodule Pru.Port do
   PRU pin number on the system should be `:input` or `:output`.
   """
   @spec start_link(integer,  [term]) :: {:ok, pid}
-  def start_link(pin,  opts \\ []) do
+  def start_link(pin, opts \\ []) do
     GenServer.start_link(__MODULE__, [pin], opts)
   end
 
@@ -55,7 +55,8 @@ defmodule Pru.Port do
 
   # gen_server callbacks
   def init([pin]) do
-    executable = :code.priv_dir(:pru) ++ '/ale'
+    IO.puts "Pru.Port init - pin: #{inspect pin}"
+    executable = :code.priv_dir(:pru) ++ '/pru_msg'
 
     port =
       Port.open({:spawn_executable, executable}, [
@@ -66,17 +67,24 @@ defmodule Pru.Port do
         :exit_status
       ])
 
-    state = %State{port: port, pin: pin}
+    state = %State{port: port, pin: pin, callbacks: []}
     {:ok, state}
   end
 
   def handle_call(:read, _from, state) do
-    {:ok, response} = call_port(state, :read, [])
+    response = call_port(state, :read, [])
     {:reply, response, state}
   end
 
   def handle_call({:write, value}, _from, state) do
     {:ok, response} = call_port(state, :write, value)
+    {:reply, response, state}
+  end
+
+  def handle_call({:set_int, direction, requestor}, _from, state) do
+    {:ok, response} = call_port(state, :set_int, direction)
+    new_callbacks = insert_unique(state.callbacks, requestor)
+    state = %{state | callbacks: new_callbacks}
     {:reply, response, state}
   end
 
@@ -87,6 +95,11 @@ defmodule Pru.Port do
   def handle_info({_, {:data, <<?n, message::binary>>}}, state) do
     msg = :erlang.binary_to_term(message)
     handle_port(msg, state)
+  end
+
+  def handle_info({_, other}, state) do
+    IO.puts "handle_info: other - #{inspect other}, state: #{inspect state}"
+    {:noreply, state}
   end
 
   defp call_port(state, command, arguments) do
@@ -102,7 +115,7 @@ defmodule Pru.Port do
   end
 
   defp handle_port({:pru_interrupt, condition}, state) do
-    # IO.puts "Got interrupt on pin #{state.pin}, #{condition}"
+    IO.puts "Got interrupt on pin #{state.pin}, #{condition}"
     msg = {:pru_interrupt, state.pin, condition}
 
     for pid <- state.callbacks do
