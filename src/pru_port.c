@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *
- * GPIO port implementation.
+ * PRU port implementation.
  *
  * This code has been heavily modified from Erlang/ALE.
  * Copyright (C) 2013 Erlang Solutions Ltd.
@@ -40,16 +40,16 @@
 #endif
 
 /*
- * GPIO handling definitions and prototypes
+ * PRU handling definitions and prototypes
  */
-enum gpio_state {
-    GPIO_OUTPUT,
-    GPIO_INPUT,
-    GPIO_INPUT_WITH_INTERRUPTS
+enum pru_state {
+    PRU_OUTPUT,
+    PRU_INPUT,
+    PRU_INPUT_WITH_INTERRUPTS
 };
 
-struct gpio {
-    enum gpio_state state;
+struct pru {
+    enum pru_state state;
     int fd;
     int pin_number;
 };
@@ -78,37 +78,37 @@ int sysfs_write_file(const char *pathname, const char *value)
     return written;
 }
 
-// GPIO functions
+// PRU functions
 
 /**
- * @brief	Open and configure a GPIO
+ * @brief	Open and configure a PRU
  *
  * @param	pin           The pin structure
- * @param	pin_number    The GPIO pin
+ * @param	pin_number    The PRU pin
  * @param   dir           Direction of pin (input or output)
  *
  * @return 	1 for success, -1 for failure
  */
-int gpio_init(struct gpio *pin, unsigned int pin_number, enum gpio_state dir)
+int pru_init(struct pru *pin, unsigned int pin_number, enum pru_state dir)
 {
     /* Initialize the pin structure. */
     pin->state = dir;
     pin->fd = -1;
     pin->pin_number = pin_number;
 
-    /* Construct the gpio control file paths */
+    /* Construct the pru control file paths */
     char direction_path[64];
-    sprintf(direction_path, "/sys/class/gpio/gpio%d/direction", pin_number);
+    sprintf(direction_path, "/sys/class/pru/pru%d/direction", pin_number);
 
     char value_path[64];
-    sprintf(value_path, "/sys/class/gpio/gpio%d/value", pin_number);
+    sprintf(value_path, "/sys/class/pru/pru%d/value", pin_number);
 
-    /* Check if the gpio has been exported already. */
+    /* Check if the pru has been exported already. */
     if (access(value_path, F_OK) == -1) {
         /* Nope. Export it. */
         char pinstr[64];
         sprintf(pinstr, "%d", pin_number);
-        if (!sysfs_write_file("/sys/class/gpio/export", pinstr))
+        if (!sysfs_write_file("/sys/class/pru/export", pinstr))
             return -1;
     }
 
@@ -117,9 +117,9 @@ int gpio_init(struct gpio *pin, unsigned int pin_number, enum gpio_state dir)
        exist, we must be able to write it.
     */
     if (access(direction_path, F_OK) != -1) {
-	const char *dir_string = (dir == GPIO_OUTPUT ? "out" : "in");
+	const char *dir_string = (dir == PRU_OUTPUT ? "out" : "in");
         /* Writing the direction fails on a Raspberry Pi in what looks
-           like a race condition with exporting the GPIO. Poll until it
+           like a race condition with exporting the PRU. Poll until it
            works as a workaround. */
         int retries = 1000; /* Allow 1000 * 1 ms = 1 second max for retries */
         while (!sysfs_write_file(direction_path, dir_string) &&
@@ -134,7 +134,7 @@ int gpio_init(struct gpio *pin, unsigned int pin_number, enum gpio_state dir)
     pin->pin_number = pin_number;
 
     /* Open the value file for quick access later */
-    pin->fd = open(value_path, pin->state == GPIO_OUTPUT ? O_RDWR : O_RDONLY);
+    pin->fd = open(value_path, pin->state == PRU_OUTPUT ? O_RDWR : O_RDONLY);
     if (pin->fd < 0)
         return -1;
 
@@ -149,9 +149,9 @@ int gpio_init(struct gpio *pin, unsigned int pin_number, enum gpio_state dir)
  *
  * @return 	1 for success, -1 for failure
  */
-int gpio_write(struct gpio *pin, unsigned int val)
+int pru_write(struct pru *pin, unsigned int val)
 {
-    if (pin->state != GPIO_OUTPUT)
+    if (pin->state != PRU_OUTPUT)
         return -1;
 
     char buf = val ? '1' : '0';
@@ -165,11 +165,11 @@ int gpio_write(struct gpio *pin, unsigned int val)
 /**
 * @brief	Read the value of the pin
 *
-* @param	pin            The GPIO pin
+* @param	pin            The PRU pin
 *
 * @return 	The pin value if success, -1 for failure
 */
-int gpio_read(struct gpio *pin)
+int pru_read(struct pru *pin)
 {
     char buf;
     ssize_t amount_read = pread(pin->fd, &buf, sizeof(buf), 0);
@@ -191,44 +191,44 @@ int gpio_read(struct gpio *pin)
  *
  * @return  Returns 1 on success.
  */
-int gpio_set_int(struct gpio *pin, const char *mode)
+int pru_set_int(struct pru *pin, const char *mode)
 {
     char path[64];
-    sprintf(path, "/sys/class/gpio/gpio%d/edge", pin->pin_number);
+    sprintf(path, "/sys/class/pru/pru%d/edge", pin->pin_number);
     if (!sysfs_write_file(path, mode))
         return -1;
 
     if (strcmp(mode, "none") == 0)
-        pin->state = GPIO_INPUT;
+        pin->state = PRU_INPUT;
     else
-        pin->state = GPIO_INPUT_WITH_INTERRUPTS;
+        pin->state = PRU_INPUT_WITH_INTERRUPTS;
 
     return 1;
 }
 
 /**
- * Called after poll() returns when the GPIO sysfs file indicates
+ * Called after poll() returns when the PRU sysfs file indicates
  * a status change.
  *
  * @param pin which pin to check
  */
-void gpio_process(struct gpio *pin)
+void pru_process(struct pru *pin)
 {
-    int value = gpio_read(pin);
+    int value = pru_read(pin);
 
     char resp[256];
     int resp_index = sizeof(uint16_t); // Space for payload size
     resp[resp_index++] = 'n'; // Notification
     ei_encode_version(resp, &resp_index);
     ei_encode_tuple_header(resp, &resp_index, 2);
-    ei_encode_atom(resp, &resp_index, "gpio_interrupt");
+    ei_encode_atom(resp, &resp_index, "pru_interrupt");
     ei_encode_atom(resp, &resp_index, value ? "rising" : "falling");
     erlcmd_send(resp, resp_index);
 }
 
-void gpio_handle_request(const char *req, void *cookie)
+void pru_handle_request(const char *req, void *cookie)
 {
-    struct gpio *pin = (struct gpio *) cookie;
+    struct pru *pin = (struct pru *) cookie;
 
     // Commands are of the form {Command, Arguments}:
     // { atom(), term() }
@@ -251,25 +251,25 @@ void gpio_handle_request(const char *req, void *cookie)
     ei_encode_version(resp, &resp_index);
     if (strcmp(cmd, "read") == 0) {
         debug("read");
-        int value = gpio_read(pin);
+        int value = pru_read(pin);
         if (value !=-1)
             ei_encode_long(resp, &resp_index, value);
         else {
             ei_encode_tuple_header(resp, &resp_index, 2);
             ei_encode_atom(resp, &resp_index, "error");
-            ei_encode_atom(resp, &resp_index, "gpio_read_failed");
+            ei_encode_atom(resp, &resp_index, "pru_read_failed");
         }
     } else if (strcmp(cmd, "write") == 0) {
         long value;
         if (ei_decode_long(req, &req_index, &value) < 0)
             errx(EXIT_FAILURE, "write: didn't get value to write");
         debug("write %d", value);
-        if (gpio_write(pin, value))
+        if (pru_write(pin, value))
             ei_encode_atom(resp, &resp_index, "ok");
         else {
             ei_encode_tuple_header(resp, &resp_index, 2);
             ei_encode_atom(resp, &resp_index, "error");
-            ei_encode_atom(resp, &resp_index, "gpio_write_failed");
+            ei_encode_atom(resp, &resp_index, "pru_write_failed");
         }
     } else if (strcmp(cmd, "set_int") == 0) {
         char mode[32];
@@ -277,12 +277,12 @@ void gpio_handle_request(const char *req, void *cookie)
             errx(EXIT_FAILURE, "set_int: didn't get value");
         debug("write %s", mode);
 
-        if (gpio_set_int(pin, mode))
+        if (pru_set_int(pin, mode))
             ei_encode_atom(resp, &resp_index, "ok");
         else {
             ei_encode_tuple_header(resp, &resp_index, 2);
             ei_encode_atom(resp, &resp_index, "error");
-            ei_encode_atom(resp, &resp_index, "gpio_set_int_failed");
+            ei_encode_atom(resp, &resp_index, "pru_set_int_failed");
         }
     } else
         errx(EXIT_FAILURE, "unknown command: %s", cmd);
@@ -291,26 +291,26 @@ void gpio_handle_request(const char *req, void *cookie)
     erlcmd_send(resp, resp_index);
 }
 
-int gpio_main(int argc, char *argv[])
+int pru_main(int argc, char *argv[])
 {
     if (argc != 4)
-        errx(EXIT_FAILURE, "%s gpio <pin#> <input|output>", argv[0]);
+        errx(EXIT_FAILURE, "%s pru <pin#> <input|output>", argv[0]);
 
     int pin_number = strtol(argv[2], NULL, 0);
-    enum gpio_state initial_state;
+    enum pru_state initial_state;
     if (strcmp(argv[3], "input") == 0)
-        initial_state = GPIO_INPUT;
+        initial_state = PRU_INPUT;
     else if (strcmp(argv[3], "output") == 0)
-        initial_state = GPIO_OUTPUT;
+        initial_state = PRU_OUTPUT;
     else
         errx(EXIT_FAILURE, "Specify 'input' or 'output'");
 
-    struct gpio pin;
-    if (gpio_init(&pin, pin_number, initial_state) < 0)
-        errx(EXIT_FAILURE, "Error initializing GPIO %d as %s", pin_number, argv[3]);
+    struct pru pin;
+    if (pru_init(&pin, pin_number, initial_state) < 0)
+        errx(EXIT_FAILURE, "Error initializing PRU %d as %s", pin_number, argv[3]);
 
     struct erlcmd handler;
-    erlcmd_init(&handler, gpio_handle_request, &pin);
+    erlcmd_init(&handler, pru_handle_request, &pin);
 
     for (;;) {
         struct pollfd fdset[2];
@@ -326,7 +326,7 @@ int gpio_main(int argc, char *argv[])
         /* Always fill out the fdset structure, but only have poll() monitor
      * the sysfs file if interrupts are enabled.
      */
-        int rc = poll(fdset, pin.state == GPIO_INPUT_WITH_INTERRUPTS ? 2 : 1, -1);
+        int rc = poll(fdset, pin.state == PRU_INPUT_WITH_INTERRUPTS ? 2 : 1, -1);
         if (rc < 0) {
             // Retry if EINTR
             if (errno == EINTR)
@@ -339,7 +339,7 @@ int gpio_main(int argc, char *argv[])
             erlcmd_process(&handler);
 
         if (fdset[1].revents & POLLPRI)
-            gpio_process(&pin);
+            pru_process(&pin);
     }
 
     return 0;

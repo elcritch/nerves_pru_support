@@ -21,15 +21,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-extern int gpio_main(int argc, char *argv[]);
+extern int pru_main(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
     if (argc < 2)
-        errx(EXIT_FAILURE, "Must pass mode (e.g. gpio, i2c, spi)");
+        errx(EXIT_FAILURE, "Must pass mode (e.g. pru)");
 
-    if (strcmp(argv[1], "gpio") == 0)
-        return gpio_main(argc, argv);
+    if (strcmp(argv[1], "pru") == 0)
+        return pru_main(argc, argv);
     else
         errx(EXIT_FAILURE, "Unknown mode '%s'", argv[1]);
 
