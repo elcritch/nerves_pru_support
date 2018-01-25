@@ -22,8 +22,6 @@
 #include <string.h>
 
 extern int gpio_main(int argc, char *argv[]);
-extern int i2c_main(int argc, char *argv[]);
-extern int spi_main(int argc, char *argv[]);
 
 int main(int argc, char *argv[])
 {
@@ -32,10 +30,6 @@ int main(int argc, char *argv[])
 
     if (strcmp(argv[1], "gpio") == 0)
         return gpio_main(argc, argv);
-    else if (strcmp(argv[1], "i2c") == 0)
-        return i2c_main(argc, argv);
-    else if (strcmp(argv[1], "spi") == 0)
-        return spi_main(argc, argv);
     else
         errx(EXIT_FAILURE, "Unknown mode '%s'", argv[1]);
 

@@ -9,6 +9,8 @@ defmodule Pru.Mixfile do
       app: :pru,
       version: "0.1.0",
       elixir: "~> 1.5",
+      compilers: [:elixir_make] ++ Mix.compilers(),
+      make_clean: ["clean"],
       start_permanent: Mix.env == :prod,
       package: package(),
       deps: deps()
@@ -26,7 +28,7 @@ defmodule Pru.Mixfile do
   defp deps do
     [
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:elixir_make, "~> 0.4.0"},
+      {:elixir_make, "~> 0.4.0", runtime: false},
     ]
   end
   defp package do
