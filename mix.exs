@@ -7,7 +7,7 @@ defmodule Pru.Mixfile do
       source_url: "https://github.com/elcritch/pru",
       description: "Basic library that enables easy interaction with the PRU cores present in the BeagleBone Black.",
       app: :pru,
-      version: "0.1.0",
+      version: "0.2.0",
       elixir: "~> 1.5",
       compilers: [:elixir_make] ++ Mix.compilers(),
       make_clean: ["clean"],
