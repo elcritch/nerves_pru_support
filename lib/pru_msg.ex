@@ -8,21 +8,19 @@ defmodule Pru.Port do
 
   defmodule State do
     @moduledoc false
-    defstruct port: nil, pin: 0, direction: nil, callbacks: []
+    defstruct port: nil, pin: 0, callbacks: []
   end
 
-  @type pin_direction :: :input | :output
-  @type int_direction :: :rising | :falling | :both | :none
+  # @type pin_direction :: :input | :output
 
   # Public API
   @doc """
   Start and link a new PRU GenServer. `pin` should be a valid
-  PRU pin number on the system and `pin_direction` should be
-  `:input` or `:output`.
+  PRU pin number on the system should be `:input` or `:output`.
   """
-  @spec start_link(integer, pin_direction, [term]) :: {:ok, pid}
-  def start_link(pin, pin_direction, opts \\ []) do
-    GenServer.start_link(__MODULE__, [pin, pin_direction], opts)
+  @spec start_link(integer,  [term]) :: {:ok, pid}
+  def start_link(pin,  opts \\ []) do
+    GenServer.start_link(__MODULE__, [pin], opts)
   end
 
   @doc """
@@ -55,31 +53,20 @@ defmodule Pru.Port do
     GenServer.call(pid, :read)
   end
 
-  @doc """
-  Turn on "interrupts" on the input pin. The pin can be monitored for
-  `:rising` transitions, `:falling` transitions, or `:both`. The process
-  that calls this method will receive the messages.
-  """
-  @spec set_int(pid, int_direction) :: :ok | {:error, term}
-  def set_int(pid, direction) do
-    true = pin_interrupt_condition?(direction)
-    GenServer.call(pid, {:set_int, direction, self()})
-  end
-
   # gen_server callbacks
-  def init([pin, pin_direction]) do
+  def init([pin]) do
     executable = :code.priv_dir(:pru) ++ '/ale'
 
     port =
       Port.open({:spawn_executable, executable}, [
-        {:args, ["pru", "#{pin}", Atom.to_string(pin_direction)]},
+        {:args, ["pru", "#{pin}"]},
         {:packet, 2},
         :use_stdio,
         :binary,
         :exit_status
       ])
 
-    state = %State{port: port, pin: pin, direction: pin_direction}
+    state = %State{port: port, pin: pin}
     {:ok, state}
   end
 
@@ -90,13 +77,6 @@ defmodule Pru.Port do
 
   def handle_call({:write, value}, _from, state) do
     {:ok, response} = call_port(state, :write, value)
-    {:reply, response, state}
-  end
-
-  def handle_call({:set_int, direction, requestor}, _from, state) do
-    {:ok, response} = call_port(state, :set_int, direction)
-    new_callbacks = insert_unique(state.callbacks, requestor)
-    state = %{state | callbacks: new_callbacks}
     {:reply, response, state}
   end
 
@@ -132,11 +112,11 @@ defmodule Pru.Port do
     {:noreply, state}
   end
 
-  defp pin_interrupt_condition?(:rising), do: true
-  defp pin_interrupt_condition?(:falling), do: true
-  defp pin_interrupt_condition?(:both), do: true
-  defp pin_interrupt_condition?(:none), do: true
-  defp pin_interrupt_condition?(_), do: false
+  # defp pin_interrupt_condition?(:rising), do: true
+  # defp pin_interrupt_condition?(:falling), do: true
+  # defp pin_interrupt_condition?(:both), do: true
+  # defp pin_interrupt_condition?(:none), do: true
+  # defp pin_interrupt_condition?(_), do: false
 
   defp insert_unique(list, item) do
     if Enum.member?(list, item) do
