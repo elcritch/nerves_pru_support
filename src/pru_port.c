@@ -110,9 +110,6 @@ int pru_init(struct pru *pin, unsigned int pin_number)
  */
 int pru_write(struct pru *pin, unsigned int val)
 {
-  //if (pin->state != PRU_OUTPUT)
-  //     return -1;
-
     char buf = val ? '1' : '0';
     ssize_t amount_written = pwrite(pin->fd, &buf, sizeof(buf), 0);
     if (amount_written < (ssize_t) sizeof(buf))
