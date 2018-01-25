@@ -4,7 +4,7 @@ defmodule Pru.Mixfile do
   def project do
     [
       name: "Pru",
-      source_url: "https://github.com/nuclearcanary/pru",
+      source_url: "https://github.com/elcritch/pru",
       description: "Basic library that enables easy interaction with the PRU cores present in the BeagleBone Black.",
       app: :pru,
       version: "0.1.0",
@@ -29,9 +29,9 @@ defmodule Pru.Mixfile do
     ]
   end
   defp package do
-    [maintainers: ["Mikel Cranfill"],
+    [maintainers: ["Mikel Cranfill", "Jaremy Creechley"],
      files: ["lib", "LICENSE", "mix.exs", "README.md"],
      licenses: ["MIT"],
-     links: %{"Github" => "https://github.com/nuclearcanary/pru"}]
+     links: %{"Github" => "https://github.com/elcritch/pru"}]
   end
 end
