@@ -25,7 +25,8 @@ defmodule Pru.Mixfile do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-        {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev},
+      {:elixir_make, "~> 0.4.0"},
     ]
   end
   defp package do
