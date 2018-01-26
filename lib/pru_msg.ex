@@ -18,7 +18,7 @@ defmodule Pru.Port do
   Start and link a new PRU GenServer. `pin` should be a valid
   PRU pin number on the system should be `:input` or `:output`.
   """
-  @spec start_link(integer,  [term]) :: {:ok, pid}
+  @spec start_link(integer, [term]) :: {:ok, pid}
   def start_link(pin, opts \\ []) do
     GenServer.start_link(__MODULE__, [pin], opts)
   end
@@ -50,9 +50,19 @@ defmodule Pru.Port do
     GenServer.call(pid, :read)
   end
 
+  @doc """
+  Turn on "interrupts" on the input pin. The pin can be monitored for
+  `:rising` transitions, `:falling` transitions, or `:both`. The process
+  that calls this method will receive the messages.
+  """
+  @spec register(pid) :: :ok | {:error, term}
+  def register(pid) do
+    GenServer.cast(pid, {:register, self()})
+  end
+
   # gen_server callbacks
   def init([pin]) do
-    IO.puts "Pru.Port init - pin: #{inspect pin}"
+    IO.puts("Pru.Port init - pin: #{inspect(pin)}")
     executable = :code.priv_dir(:pru) ++ '/pru_msg'
 
     port =
@@ -88,7 +98,7 @@ defmodule Pru.Port do
   end
 
   def handle_info({_, other}, state) do
-    IO.puts "handle_info: other - #{inspect other}, state: #{inspect state}"
+    IO.puts("handle_info: other - #{inspect(other)}, state: #{inspect(state)}")
     {:noreply, state}
   end
 
@@ -105,13 +115,19 @@ defmodule Pru.Port do
   end
 
   defp handle_port({:read, value}, state) do
-    IO.puts "Received message from PRU #{state.pin}: #{value}"
+    IO.puts("Received message from PRU #{state.pin}: #{value}")
     msg = {:read, state.pin, value}
 
     for pid <- state.callbacks do
       send(pid, msg)
     end
 
+    {:noreply, state}
+  end
+
+  def handle_cast({:register, requestor}, _from, state) do
+    new_callbacks = insert_unique(state.callbacks, requestor)
+    state = %{state | callbacks: new_callbacks}
     {:noreply, state}
   end
 
