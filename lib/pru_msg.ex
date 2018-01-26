@@ -104,7 +104,7 @@ defmodule Pru.Port do
   end
 
   def handle_info({_, other}, state) do
-    IO.puts("handle_info: other - #{inspect(other)}, state: #{inspect(state)}")
+    #IO.puts("handle_info: other - #{inspect(other)}, state: #{inspect(state)}")
     {:noreply, state}
   end
 
@@ -121,8 +121,8 @@ defmodule Pru.Port do
   end
 
   defp handle_port({:read, value}, state) do
-    IO.puts("Received message from PRU #{state.pin}: #{value}")
-    msg = {:read, state.pin, value}
+    #IO.puts("Received message from PRU #{state.pin}: #{value}")
+    msg = {:pru_rx_msg, state.pin, value}
 
     for pid <- state.callbacks do
       send(pid, msg)
