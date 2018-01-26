@@ -39,6 +39,8 @@
 #define debug(...)
 #endif
 
+#define RPMSG_BUF_SIZE 512
+
 /*
  * PRU handling definitions and prototypes
  */
@@ -108,12 +110,11 @@ int pru_init(struct pru *pin, unsigned int pin_number)
  *
  * @return 	1 for success, -1 for failure
  */
-int pru_write(struct pru *pin, unsigned int val)
+int pru_write(struct pru *pin, char *wr_msg, long wr_len)
 {
-    char buf = val ? '1' : '0';
-    ssize_t amount_written = pwrite(pin->fd, &buf, sizeof(buf), 0);
-    if (amount_written < (ssize_t) sizeof(buf))
-        err(EXIT_FAILURE, "pwrite");
+    ssize_t amount_written = pwrite(pin->fd, wr_msg, wr_len, 0);
+    if (amount_written < (ssize_t) wr_len)
+        err(EXIT_FAILURE, "pwrite overwrite");
 
     return 1;
 }
@@ -125,14 +126,13 @@ int pru_write(struct pru *pin, unsigned int val)
 *
 * @return 	The pin value if success, -1 for failure
 */
-int pru_read(struct pru *pin)
+long pru_read(struct pru *pin, char *rd_msg, long rd_len)
 {
-    char buf;
-    ssize_t amount_read = pread(pin->fd, &buf, sizeof(buf), 0);
-    if (amount_read < (ssize_t) sizeof(buf))
+    long amount_read = (long) pread(pin->fd, rd_msg, rd_len, 0);
+    if (amount_read > rd_len)
         err(EXIT_FAILURE, "pread");
 
-    return buf == '1' ? 1 : 0;
+    return amount_read;
 }
 
 /**
@@ -143,16 +143,22 @@ int pru_read(struct pru *pin)
  */
 void pru_process(struct pru *pin)
 {
-    int value = pru_read(pin);
+    debug("read");
+    long rd_len;
+    char rd_msg[RPMSG_BUF_SIZE+1];
 
-    char resp[256];
+    rd_len = pru_read(pin, rd_msg, sizeof(rd_msg));
+
+    char resp[256+RPMSG_BUF_SIZE];
     int resp_index = sizeof(uint16_t); // Space for payload size
+
     resp[resp_index++] = 'n'; // Notification
+
     ei_encode_version(resp, &resp_index);
     ei_encode_tuple_header(resp, &resp_index, 2);
-    ei_encode_atom(resp, &resp_index, "pru_interrupt");
-    //ei_encode_atom(resp, &resp_index, value ? "rising" : "falling");
-    ei_encode_long(resp, &resp_index, value);
+    ei_encode_atom(resp, &resp_index, "read");
+    ei_encode_binary(resp, &resp_index, rd_msg, rd_len);
+
     erlcmd_send(resp, resp_index);
 }
 
@@ -175,27 +181,54 @@ void pru_handle_request(const char *req, void *cookie)
     if (ei_decode_atom(req, &req_index, cmd) < 0)
         errx(EXIT_FAILURE, "expecting command atom");
 
-    char resp[256];
+    char resp[256+RPMSG_BUF_SIZE];
     int resp_index = sizeof(uint16_t); // Space for payload size
     resp[resp_index++] = 'r'; // Response
     ei_encode_version(resp, &resp_index);
 
     if (strcmp(cmd, "read") == 0) {
-        debug("read");
-        int value = pru_read(pin);
-        if (value !=-1)
-            ei_encode_long(resp, &resp_index, value);
-        else {
-            ei_encode_tuple_header(resp, &resp_index, 2);
-            ei_encode_atom(resp, &resp_index, "error");
-            ei_encode_atom(resp, &resp_index, "pru_read_failed");
-        }
-    } else if (strcmp(cmd, "write") == 0) {
-        long value;
-        if (ei_decode_long(req, &req_index, &value) < 0)
-            errx(EXIT_FAILURE, "write: didn't get value to write");
-        debug("write %d", value);
-        if (pru_write(pin, value))
+        errx(EXIT_FAILURE, "read: only interrupts supported");
+    /*     debug("read"); */
+    /*     char rd_msg[RPMSG_BUF_SIZE+1]; */
+    /*     long rd_len = pru_read(pin, rd_msg, RPMSG_BUF_SIZE); */
+
+    /*     if (rd_len >= 0) { */
+    /*       //ei_encode_binary(resp, &resp_index, rd_msg, rd_len); */
+    /*         ei_encode_tuple_header(resp, &resp_index, 2); */
+    /*         ei_encode_atom(resp, &resp_index, "read"); */
+    /*         ei_encode_binary(resp, &resp_index, rd_msg, rd_len); */
+    /*     } */
+    /*     else { */
+    /*         ei_encode_tuple_header(resp, &resp_index, 2); */
+    /*         ei_encode_atom(resp, &resp_index, "error"); */
+    /*         ei_encode_atom(resp, &resp_index, "pru_read_failed"); */
+    /*     } */
+    } 
+
+    if (strcmp(cmd, "write") == 0) {
+        long wr_len;
+        int wr_type, wr_size;
+        char wr_msg[RPMSG_BUF_SIZE+1];
+
+        // int ei_get_type(const char *buf, const int *index, int *type, int *size) 
+        //if (ei_decode_long(req, &req_index, &value) < 0)
+        ei_get_type(req, &req_index, &wr_type, &wr_size); 
+
+        if (wr_type != ERL_BINARY_EXT)
+            errx(EXIT_FAILURE, "write: didn't get binary to write");
+
+        if (wr_size >= RPMSG_BUF_SIZE)
+            errx(EXIT_FAILURE, "write: binary message too long");
+
+        if (ei_decode_binary(req, &req_index, &wr_msg, &wr_len))
+            errx(EXIT_FAILURE, "write: couldn't get binary to write");
+
+        wr_msg[RPMSG_BUF_SIZE] = '\0';
+
+        debug("write %d", wr_msg);
+        int wr_res = pru_write(pin, wr_msg, wr_len);
+
+        if (wr_res != -1)
             ei_encode_atom(resp, &resp_index, "ok");
         else {
             ei_encode_tuple_header(resp, &resp_index, 2);
