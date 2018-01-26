@@ -92,6 +92,12 @@ defmodule Pru.Port do
     {:stop, :normal, state}
   end
 
+  def handle_cast({:register, requestor}, state) do
+    new_callbacks = insert_unique(state.callbacks, requestor)
+    state = %{state | callbacks: new_callbacks}
+    {:noreply, state}
+  end
+
   def handle_info({_, {:data, <<?n, message::binary>>}}, state) do
     msg = :erlang.binary_to_term(message)
     handle_port(msg, state)
@@ -122,12 +128,6 @@ defmodule Pru.Port do
       send(pid, msg)
     end
 
-    {:noreply, state}
-  end
-
-  def handle_cast({:register, requestor}, _from, state) do
-    new_callbacks = insert_unique(state.callbacks, requestor)
-    state = %{state | callbacks: new_callbacks}
     {:noreply, state}
   end
 
