@@ -115,6 +115,17 @@ defmodule Pru.Port do
     {:noreply, state}
   end
 
+  defp handle_port({:read, value}, state) do
+    IO.puts "Got interrupt on pin #{state.pin}, #{value}"
+    msg = {:read, state.pin, value}
+
+    for pid <- state.callbacks do
+      send(pid, msg)
+    end
+
+    {:noreply, state}
+  end
+
   # defp pin_interrupt_condition?(:rising), do: true
   # defp pin_interrupt_condition?(:falling), do: true
   # defp pin_interrupt_condition?(:both), do: true
