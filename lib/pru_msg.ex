@@ -104,19 +104,8 @@ defmodule Pru.Port do
     end
   end
 
-  defp handle_port({:pru_interrupt, condition}, state) do
-    IO.puts "Got interrupt on pin #{state.pin}, #{condition}"
-    msg = {:pru_interrupt, state.pin, condition}
-
-    for pid <- state.callbacks do
-      send(pid, msg)
-    end
-
-    {:noreply, state}
-  end
-
   defp handle_port({:read, value}, state) do
-    IO.puts "Got interrupt on pin #{state.pin}, #{value}"
+    IO.puts "Received message from PRU #{state.pin}: #{value}"
     msg = {:read, state.pin, value}
 
     for pid <- state.callbacks do
@@ -125,12 +114,6 @@ defmodule Pru.Port do
 
     {:noreply, state}
   end
-
-  # defp pin_interrupt_condition?(:rising), do: true
-  # defp pin_interrupt_condition?(:falling), do: true
-  # defp pin_interrupt_condition?(:both), do: true
-  # defp pin_interrupt_condition?(:none), do: true
-  # defp pin_interrupt_condition?(_), do: false
 
   defp insert_unique(list, item) do
     if Enum.member?(list, item) do
