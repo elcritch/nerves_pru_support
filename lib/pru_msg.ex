@@ -38,12 +38,9 @@ defmodule Pru.Port do
   high being output.
   """
   @spec write(pid, 0 | 1 | true | false) :: :ok | {:error, term}
-  def write(pid, value) when is_integer(value) do
+  def write(pid, value) do
     GenServer.call(pid, {:write, value})
   end
-
-  def write(pid, true), do: write(pid, 1)
-  def write(pid, false), do: write(pid, 0)
 
   @doc """
   Read the current value of the pin.
@@ -78,13 +75,6 @@ defmodule Pru.Port do
 
   def handle_call({:write, value}, _from, state) do
     {:ok, response} = call_port(state, :write, value)
-    {:reply, response, state}
-  end
-
-  def handle_call({:set_int, direction, requestor}, _from, state) do
-    {:ok, response} = call_port(state, :set_int, direction)
-    new_callbacks = insert_unique(state.callbacks, requestor)
-    state = %{state | callbacks: new_callbacks}
     {:reply, response, state}
   end
 
