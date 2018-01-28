@@ -18,8 +18,10 @@ defmodule Pru.Port do
   @doc """
   """
   @spec start_link(integer, [term]) :: {:ok, pid}
-  def start_link(pin, opts \\ [], msgoptions \\ []) do
-    GenServer.start_link(__MODULE__, [pin, msgoptions], opts)
+  def start_link(pin, opts \\ []) do
+    enc = Keyword.pop(opts, :encoder)
+    dec = Keyword.pop(opts, :decoder)
+    GenServer.start_link(__MODULE__, [pin, encoder: enc, decoder: dec], opts)
   end
 
   @doc """
@@ -73,8 +75,8 @@ defmodule Pru.Port do
         :exit_status
       ])
 
-    encoder = Keyword.get(msgopts, :encoder, fn x -> x end)
-    decoder = Keyword.get(msgopts, :decoder, fn x -> x end)
+    encoder = Keyword.get(msgopts, :encoder) || fn x -> x end
+    decoder = Keyword.get(msgopts, :decoder) || fn x -> x end
 
     state = %State{port: port, pin: pin, encoder: encoder, decoder: decoder, callbacks: []}
     {:ok, state}
@@ -106,7 +108,7 @@ defmodule Pru.Port do
   end
 
   def handle_info({_, other}, state) do
-    IO.puts("handle_info: other - #{inspect(other)}, state: #{inspect(state)}")
+    Logger.error ("handle_info: other - #{inspect(other)}, state: #{inspect(state)}")
     {:noreply, state}
   end
 
