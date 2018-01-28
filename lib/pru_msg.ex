@@ -12,6 +12,8 @@ defmodule Pru.Port do
     defstruct port: nil, pin: 0, encoder: nil, decoder: nil, callbacks: []
   end
 
+  @options [:encoder, :decoder]
+
   # @type pin_direction :: :input | :output
 
   # Public API
@@ -19,9 +21,7 @@ defmodule Pru.Port do
   """
   @spec start_link(integer, [term]) :: {:ok, pid}
   def start_link(pin, opts \\ []) do
-    enc = Keyword.pop(opts, :encoder)
-    dec = Keyword.pop(opts, :decoder)
-    GenServer.start_link(__MODULE__, [pin, encoder: enc, decoder: dec], opts)
+    GenServer.start_link(__MODULE__, [pin, Keyword.take(opts, @options) ], Keyword.drop(opts, @options))
   end
 
   @doc """
@@ -75,8 +75,8 @@ defmodule Pru.Port do
         :exit_status
       ])
 
-    encoder = Keyword.get(msgopts, :encoder) || fn x -> x end
-    decoder = Keyword.get(msgopts, :decoder) || fn x -> x end
+    encoder = msgopts[:encoder] || fn x -> x end
+    decoder = msgopts[:decoder] || fn x -> x end
 
     state = %State{port: port, pin: pin, encoder: encoder, decoder: decoder, callbacks: []}
     {:ok, state}
@@ -125,7 +125,7 @@ defmodule Pru.Port do
   end
 
   defp handle_port({:read, value}, state) do
-    Logger.info("Received message from PRU #{state.pin}: #{value}")
+    Logger.debug("Received message from PRU #{state.pin}: #{value}")
     msg = {:pru_rx_msg, state.pin, state.decoder.(value)}
 
     for pid <- state.callbacks do
