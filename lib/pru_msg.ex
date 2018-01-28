@@ -1,5 +1,6 @@
 defmodule Pru.Port do
   use GenServer
+  require Logger
 
   @moduledoc """
   This is an Elixir interface to Linux PRUs. Each PRU is an
@@ -8,19 +9,17 @@ defmodule Pru.Port do
 
   defmodule State do
     @moduledoc false
-    defstruct port: nil, pin: 0, callbacks: []
+    defstruct port: nil, pin: 0, encoder: nil, decoder: nil, callbacks: []
   end
 
   # @type pin_direction :: :input | :output
 
   # Public API
   @doc """
-  Start and link a new PRU GenServer. `pin` should be a valid
-  PRU pin number on the system should be `:input` or `:output`.
   """
   @spec start_link(integer, [term]) :: {:ok, pid}
-  def start_link(pin, opts \\ []) do
-    GenServer.start_link(__MODULE__, [pin], opts)
+  def start_link(pin, opts \\ [], msgoptions \\ []) do
+    GenServer.start_link(__MODULE__, [pin, msgoptions], opts)
   end
 
   @doc """
@@ -37,7 +36,7 @@ defmodule Pru.Port do
   or `true` for logic high. Other non-zero values will result in logic
   high being output.
   """
-  @spec write(pid, 0 | 1 | true | false) :: :ok | {:error, term}
+  @spec write(pid, term() ) :: :ok | {:error, term}
   def write(pid, value) do
     GenServer.call(pid, {:write, value})
   end
@@ -61,8 +60,8 @@ defmodule Pru.Port do
   end
 
   # gen_server callbacks
-  def init([pin]) do
-    IO.puts("Pru.Port init - pin: #{inspect(pin)}")
+  def init([pin, msgopts]) do
+    Logger.info("Pru.Port init - pin: #{inspect(pin)} ")
     executable = :code.priv_dir(:pru) ++ '/pru_msg'
 
     port =
@@ -74,17 +73,20 @@ defmodule Pru.Port do
         :exit_status
       ])
 
-    state = %State{port: port, pin: pin, callbacks: []}
+    encoder = Keyword.get(msgopts, :encoder, fn x -> x end)
+    decoder = Keyword.get(msgopts, :decoder, fn x -> x end)
+
+    state = %State{port: port, pin: pin, encoder: encoder, decoder: decoder, callbacks: []}
     {:ok, state}
   end
 
-  def handle_call(:read, _from, state) do
-    response = call_port(state, :read, [])
-    {:reply, response, state}
-  end
+  # def handle_call(:read, _from, state) do
+  #   response = call_port(state, :read, [])
+  #   {:reply, response, state}
+  # end
 
   def handle_call({:write, value}, _from, state) do
-    {:ok, response} = call_port(state, :write, value)
+    {:ok, response} = call_port(state, :write, state.encoder.(value))
     {:reply, response, state}
   end
 
@@ -104,7 +106,7 @@ defmodule Pru.Port do
   end
 
   def handle_info({_, other}, state) do
-    #IO.puts("handle_info: other - #{inspect(other)}, state: #{inspect(state)}")
+    IO.puts("handle_info: other - #{inspect(other)}, state: #{inspect(state)}")
     {:noreply, state}
   end
 
@@ -121,8 +123,8 @@ defmodule Pru.Port do
   end
 
   defp handle_port({:read, value}, state) do
-    #IO.puts("Received message from PRU #{state.pin}: #{value}")
-    msg = {:pru_rx_msg, state.pin, value}
+    Logger.info("Received message from PRU #{state.pin}: #{value}")
+    msg = {:pru_rx_msg, state.pin, state.decoder.(value)}
 
     for pid <- state.callbacks do
       send(pid, msg)
