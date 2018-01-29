@@ -38,8 +38,28 @@ Pru.reboot 0        # Reboots PRU core 0
 # Boot will fail if firmware is not loaded to /lib/firmware/am335x-pru0-fw
 ```
 
-## TODO
-Add RPMsg messaging support
+## RPmsg (async)
+
+Support for async RPmsg (beta) has been added through the `/dev/rpmsg_pru(31|32)` character devices. It seems to work well but has not been thoroughly tested. 
+
+Example usage of messaging a PRU from the Elixir side (using TI's RPmsg echo example):
+
+```
+{:ok, pid} = Pru.Port.start_link(31) # start link 
+Pru.Port.register(pid)
+Pru.Port.write(pid, ["hello world!"] )
+{:pru_rx_msg, 31, "hello world!"} = receive do data -> data after 1_000 -> :nil end ;
+```
+
+This requires that RPmsg linux driver & PRU code are both ready and loaded. Currently the linux module can take ~10 seconds to load on my test devices (BBB Green). 
+
+
+## TODO:
+
+- Test RPmsg character device speed / stability
+- Improve loading time
+- Add `mix pru.new` generators for PRU firmware and makefiles. 
+
 
 ## Docs
 Documentation can be found at [https://hexdocs.pm/pru](https://hexdocs.pm/pru).
