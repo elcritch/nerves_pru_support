@@ -53,6 +53,19 @@ Pru.Port.write(pid, ["hello world!"] )
 
 This requires that RPmsg linux driver & PRU code are both ready and loaded. Currently the linux module can take ~10 seconds to load on my test devices (BBB Green). 
 
+### RPmsg & Msgpax
+
+A custom encoder and/or decoder for messages can be configured. This is useful for communicating with the PRU's using a protocol like MessagePack for easy communication of data types to/from PRU's. 
+
+```
+{:ok, pid} = Pru.Port.start_link(31, encoder: fn x -> x |> Msgpax.pack!() |> IO.iodata_to_binary() end, decoder: fn x -> x |> Msgpax.unpack!() end)
+Pru.Port.register(pid)
+Pru.Port.write(pid, ["setBlink", 1200] )
+{:pru_rx_msg, 31, {"ok", "blink", 1200} } = receive do data -> data after 1_000 -> :nil end ;
+```
+
+This example uses the excellent [Msgpax](https://github.com/lexmag/msgpax) library. 
+
 
 ## TODO:
 
