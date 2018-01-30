@@ -21,7 +21,11 @@ defmodule Pru.Port do
   """
   @spec start_link(integer, [term]) :: {:ok, pid}
   def start_link(pin, opts \\ []) do
-    GenServer.start_link(__MODULE__, [pin, Keyword.take(opts, @options) ], Keyword.drop(opts, @options))
+    GenServer.start_link(
+      __MODULE__,
+      [pin, Keyword.take(opts, @options)],
+      Keyword.drop(opts, @options) ++ [name: String.to_atom("#{__MODULE__}#{pin}")]
+    )
   end
 
   @doc """
@@ -38,7 +42,7 @@ defmodule Pru.Port do
   or `true` for logic high. Other non-zero values will result in logic
   high being output.
   """
-  @spec write(pid, term() ) :: :ok | {:error, term}
+  @spec write(pid, term()) :: :ok | {:error, term}
   def write(pid, value) do
     GenServer.call(pid, {:write, value})
   end
@@ -108,7 +112,7 @@ defmodule Pru.Port do
   end
 
   def handle_info({_, other}, state) do
-    Logger.error ("handle_info: other - #{inspect(other)}, state: #{inspect(state)}")
+    Logger.error("handle_info: other - #{inspect(other)}, state: #{inspect(state)}")
     {:noreply, state}
   end
 
