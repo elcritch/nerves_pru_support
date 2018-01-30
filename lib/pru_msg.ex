@@ -24,7 +24,7 @@ defmodule Pru.Port do
     GenServer.start_link(
       __MODULE__,
       [pin, Keyword.take(opts, @options)],
-      Keyword.drop(opts, @options) ++ [name: String.to_atom("#{__MODULE__}#{pin}")]
+      Keyword.drop(opts, @options) ++ [name: String.to_atom("#{__MODULE__}.Pin#{pin}")]
     )
   end
 
