@@ -19,7 +19,7 @@ defmodule Pru.Mixfile do
       package: package(),
       # aliases: aliases(),
       aliases:  [
-        # "deps.get": ["deps.get", "nerves.deps.get"],
+        "deps.get": ["deps.get", "nerves.deps.get"],
         # "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"]
       ],
       deps: deps()
