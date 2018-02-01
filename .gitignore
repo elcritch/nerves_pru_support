@@ -25,3 +25,5 @@ elixir_ale-*.tar
 # Ignore C object files and executables
 /priv
 *.o
+*.lib
+gen/
