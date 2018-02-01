@@ -19,7 +19,7 @@ defmodule Pru.Mixfile do
       package: package(),
       # aliases: aliases(),
       aliases:  [
-        "deps.get": ["deps.get", "nerves.deps.get"],
+        # "deps.get": ["deps.get", "nerves.deps.get"],
         # "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"]
       ],
       deps: deps()
@@ -55,7 +55,7 @@ defmodule Pru.Mixfile do
     [
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:elixir_make, "~> 0.4.0", runtime: false},
-      {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "master", override: true },
+      # {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "master", override: true },
       {:extras_toolchain_pru_cgt, "~> 0.1", git: "https://github.com/elcritch/extras_toolchain_pru_cgt.git", branch: "v0.1.x"},
     ]
   end
