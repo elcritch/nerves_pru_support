@@ -1,5 +1,7 @@
 SUBDIRS = src pru/lib/rpmsg pru/lib/pru_support pru/lib/msgpack
 
+export PRU_CGT=$(shell mix nerves.path.artifact extras_toolchain_pru_cgt)/ti-cgt-pru
+
 all: $(SUBDIRS)
 
 priv_dir:
