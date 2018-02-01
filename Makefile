@@ -4,7 +4,7 @@ all: $(SUBDIRS)
 
 priv_dir:
 	mkdir -p priv/pru/include
-	cp -R pru/include/* priv/pru/include/
+	cp -RL pru/include/* priv/pru/include/
 
 clean_priv:
 	rm -Rf priv/pru/
