@@ -32,7 +32,7 @@ defmodule Pru.Mixfile do
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:elixir_make, "~> 0.4.0", runtime: false},
       {:nerves, git: "https://github.com/elcritch/nerves.git", branch: "master", override: true },
-      {:nerves_pru_icss, "~> 0.1", git: "https://github.com/elcritch/nerves_pru_icss.git", branch: "v0.1.x"},
+      {:extras_toolchain_pru_cgt, "~> 0.1", git: "https://github.com/elcritch/extras_toolchain_pru_cgt.git", branch: "v0.1.x"},
     ]
   end
 
