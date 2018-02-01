@@ -15,6 +15,7 @@ defmodule Pru.Mixfile do
       elixir: "~> 1.5",
       compilers: [:elixir_make] ++ Mix.compilers(),
       make_clean: ["clean"],
+      make_env: %{ "PRU_CGT" => System.user_home() <> "/.nerves/artifacts/extras_toolchain_pru_cgt-portable-0.1.0/ti-cgt-pru/"},
       start_permanent: Mix.env() == :prod,
       package: package(),
       # aliases: aliases(),
