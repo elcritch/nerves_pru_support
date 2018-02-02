@@ -1,14 +1,14 @@
 defmodule Pru.Mixfile do
   use Mix.Project
 
-  @app :nerves_pru
+  @app :nerves_pru_support
 
   def project do
     [
       name: @app,
       description:
         "Basic library that enables easy interaction with the PRU cores present in the BeagleBone Black.",
-      app: :pru,
+      app: @app,
       nerves_package: nerves_package(),
       # archives: [nerves_bootstrap: "~> 0.6"],
       version: "0.3.0",
