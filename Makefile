@@ -12,6 +12,7 @@ clean_priv:
 	rm -Rf priv/pru/
 
 $(SUBDIRS): priv_dir
+	env | grep -i pru | sort
 	$(MAKE) -C $@
 
 clean: clean_priv
