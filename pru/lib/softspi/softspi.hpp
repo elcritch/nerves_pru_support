@@ -24,8 +24,6 @@
 #include <pru_support_lib.h>
 #include "spi_helpers.hpp"
 
-#include <pru_support_lib.h>
-#include "spi_helpers.hpp"
 #ifndef LOW
 #define LOW false
 #endif
@@ -33,6 +31,12 @@
 #define HIGH true
 #endif
 
+
+#ifndef NOOP
+// __nop();
+// __asm__("nop\n\t");
+#define NOOP() __delay_cycles(1000)
+#endif
 
 template <class IOPins,
           Polarity CPOL = Std,
@@ -46,13 +50,11 @@ struct SoftSPI {
 
   Clock clock;
 
-  Pin cs;
-
   uint8_t xfer_cycle(uint8_t b); // member template
 
   void start() {
     spi_select();
-    SpiClock<SCK, CPOL>::tick();
+    clock.tick(IOPins::SCK());
   }
 
   inline void select() { gpio_write(cs, LOW); }
@@ -60,8 +62,7 @@ struct SoftSPI {
 
   inline void delayCycles(int cycles) {
     for (int i = 0; i++; i < cycles) {
-      // __asm__("nop\n\t");
-      // __nop();
+      NOOP();
     }
   }
 

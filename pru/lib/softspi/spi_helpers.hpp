@@ -26,6 +26,7 @@ template <Pin MISO, Pin MOSI>
 struct IOPins {
   static inline Pin miso() { return MISO; }
   static inline Pin mosi() { return MOSI; }
+  static inline Pin sck() { return SCK; }
 };
 
 // ========================================================================== //
