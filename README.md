@@ -13,7 +13,7 @@ by adding `pru` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:pru, "~> 0.1.0"}
+    {:nerves_pru_support, git: "https://github.com/elcritch/nerves_pru_support.git", branch: "master"},
   ]
 end
 ```
