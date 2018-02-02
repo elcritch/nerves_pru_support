@@ -38,17 +38,19 @@
 #define NOOP() __delay_cycles(1000)
 #endif
 
-template <class IOPins,
-          Polarity CPOL = Std,
+template <Polarity CPOL = Std,
           PollEdge CPHA = Rising,
-          BitOrder BITEND = MsbFirst
-          >
+          BitOrder BITEND = MsbFirst>
 struct SoftSPI {
 
   typedef SpiClock<CPOL> Clock;
   typedef SpiPack<BITEND> Packer;
 
+  IOPins pins;
+  ClockTimings timings;
   Clock clock;
+
+  SoftSPI(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings) {}
 
   uint8_t xfer_cycle(uint8_t b); // member template
 

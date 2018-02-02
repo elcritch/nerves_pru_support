@@ -22,11 +22,18 @@ enum PollEdge {
 
 typedef uint32_t Pin;
 
-template <Pin MISO, Pin MOSI>
 struct IOPins {
-  static inline Pin miso() { return MISO; }
-  static inline Pin mosi() { return MOSI; }
-  static inline Pin sck() { return SCK; }
+  const Pin miso;
+  const Pin mosi;
+  const Pin sck;
+};
+
+struct ClockTimings {
+  const uint8_t r0;
+  const uint8_t p0;
+  const uint8_t p1;
+  const uint8_t c0;
+  const uint8_t c1;
 };
 
 // ========================================================================== //
@@ -34,8 +41,13 @@ struct IOPins {
 // ========================================================================== //
 template <Polarity CPOL>
 struct SpiClock {
-  void tick(Pin sck);
-  void tock(Pin sck);
+
+  Pin sck;
+  ClockTimings timings;
+
+  SpiClock(Pin _s, ClockTimings& _t) : sck(_s), timings(_t) {}
+  void tick();
+  void tock();
   void delayCycles();
   void delayCyclesP0();
   void delayCyclesP1();
@@ -45,15 +57,15 @@ struct SpiClock {
 
 //  clock inverted
 template<>
-void SpiClock<Inv>::tick(Pin sck) {  digitalWrite(sck, LOW); }
+void SpiClock<Inv>::tick() {  digitalWrite(sck, LOW); }
 template<>
-void SpiClock<Inv>::tock(Pin sck) {  digitalWrite(sck, HIGH); }
+void SpiClock<Inv>::tock() {  digitalWrite(sck, HIGH); }
 
 //  clock standard
 template<>
-void SpiClock<Std>::tick(Pin sck) {  digitalWrite(sck, HIGH); }
+void SpiClock<Std>::tick() {  digitalWrite(sck, HIGH); }
 template<>
-void SpiClock<Std>::tock(Pin sck) {  digitalWrite(sck, LOW); }
+void SpiClock<Std>::tock() {  digitalWrite(sck, LOW); }
 
 
 // ========================================================================== //
