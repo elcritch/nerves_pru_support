@@ -18,23 +18,37 @@
 //   static int pin;
 // };
 
+#ifndef _SOFTWARE_SPI_H
+#define _SOFTWARE_SPI_H
+
+#include <pru_support_lib.h>
+#include "spi_helpers.hpp"
+
+#include <pru_support_lib.h>
+#include "spi_helpers.hpp"
+#ifndef LOW
+#define LOW false
+#endif
+#ifndef HIGH
+#define HIGH true
+#endif
+
+
 template <class IOPins,
-          class Clock,
-          Polarity CPOL == Polarity::Std,
-          Poll CPHA = Poll::Rising,
-          BitOrder BITEND = BitOrder::MsbFirst
+          Polarity CPOL = Std,
+          PollEdge CPHA = Rising,
+          BitOrder BITEND = MsbFirst
           >
 struct SoftSPI {
 
-  typedef Clock SpiClock<SCK, CPOL>;
-  typedef Packer SpiPack<BITEND>;
+  typedef SpiClock<CPOL> Clock;
+  typedef SpiPack<BITEND> Packer;
 
   Clock clock;
 
   Pin cs;
 
   uint8_t xfer_cycle(uint8_t b); // member template
-  uint8_t transfer(uint8_t b); // member template
 
   void start() {
     spi_select();
@@ -50,31 +64,32 @@ struct SoftSPI {
       // __nop();
     }
   }
-};
 
-  // mode 0: SCK idle low, phase: reading at middle of SCK HIGH pulse
-  // mode 1: SCK idle low, phase: reading at middle of SCK LOW pulse
-  // this big-bang should work for both  CPHA=1  and CPHA=0
-
-uint8_t spi_transfer(uint8_t b) {
+  uint8_t transfer(uint8_t b) {
     uint8_t reply = 0;
     char bits[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // reading buffer
 
     // here, delay is added, to make CPHA=1 and CPHA=0 both work!
-    delayCycles(DELAY_CYCLES); // checking timing characteristics, need delay
-                               // from CS to rising edge?
+    clock.delayCyclesDelayCycles(); // checking timing characteristics, need delay
+    // from CS to rising edge?
     uint8_t idx;
     for (idx = 0; idx < 8; idx++) {
       SpiXfer.xfer_cycle<IOPins, Clock>( Packer::mask(b, idx) );
     }
 
     clock::delayCycles(); // checking timing characteristics, it is no
-                               // needed by AD7730, from CS to rising edge
+    // needed by AD7730, from CS to rising edge
     unselect();
 
     reply = Packer::pack(bits);
 
     return reply;
   }
+};
+
+  // mode 0: SCK idle low, phase: reading at middle of SCK HIGH pulse
+  // mode 1: SCK idle low, phase: reading at middle of SCK LOW pulse
+  // this big-bang should work for both  CPHA=1  and CPHA=0
+
 
 #endif

@@ -1,4 +1,4 @@
-SUBDIRS = src pru/lib/rpmsg pru/lib/pru_support pru/lib/msgpack
+SUBDIRS = src pru/lib/rpmsg pru/lib/pru_support pru/lib/msgpack pru/lib/softspi
 
 #export PRU_CGT=$(shell mix nerves.path.artifact extras_toolchain_pru_cgt)/ti-cgt-pru
 

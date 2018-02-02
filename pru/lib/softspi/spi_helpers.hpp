@@ -1,7 +1,9 @@
 
 
-#ifndef _SOFTWARE_SPI_H
-#define _SOFTWARE_SPI_H
+#ifndef _SOFTWARE_SPI_HELPERS_H
+#define _SOFTWARE_SPI_HELPERS_H
+
+#include <stdint.h>
 
 enum BitOrder {
   MsbFirst,
@@ -13,12 +15,12 @@ enum Polarity {
   Inv,
 };
 
-enum Poll {
+enum PollEdge {
   Rising,
   Falling,
 };
 
-typedef Pin uint32_t;
+typedef uint32_t Pin;
 
 template <Pin MISO, Pin MOSI>
 struct IOPins {
@@ -29,11 +31,10 @@ struct IOPins {
 // ========================================================================== //
 // SPI Clock
 // ========================================================================== //
-template <class IOPins, Polarity CPOL = Polarity::Std>
+template <Polarity CPOL>
 struct SpiClock {
-  const Pin sck = SCK;
-  void tick();
-  void tock();
+  void tick(Pin sck);
+  void tock(Pin sck);
   void delayCycles();
   void delayCyclesP0();
   void delayCyclesP1();
@@ -42,12 +43,16 @@ struct SpiClock {
 };
 
 //  clock inverted
-template<> template<Pin sck> uint8_t SpiClock<Pin sck, Polarity::Inv>::tick() { gpio_write(sck, LOW); }
-template<> template<Pin sck> uint8_t SpiClock<Pin sck, Polarity::Inv>::tock() { gpio_write(sck, HIGH); }
+template<>
+void SpiClock<Inv>::tick(Pin sck) {  digitalWrite(sck, LOW); }
+template<>
+void SpiClock<Inv>::tock(Pin sck) {  digitalWrite(sck, HIGH); }
 
 //  clock standard
-template<> template<Pin sck> uint8_t SpiClock<Pin sck, Polarity::Std>::tick() { gpio_write(sck, HIGH); }
-template<> template<Pin sck> uint8_t SpiClock<Pin sck, Polarity::Std>::tick() { gpio_write(sck, LOW); }
+template<>
+void SpiClock<Std>::tick(Pin sck) {  digitalWrite(sck, HIGH); }
+template<>
+void SpiClock<Std>::tock(Pin sck) {  digitalWrite(sck, LOW); }
 
 
 // ========================================================================== //
@@ -56,46 +61,48 @@ template<> template<Pin sck> uint8_t SpiClock<Pin sck, Polarity::Std>::tick() { 
 template <BitOrder BITEND>
 struct SpiPack {
   static uint8_t mask(uint8_t byte, uint8_t idx);
-  static uint8_t pack(uint8_t bits);
+  static uint8_t pack(uint8_t bits[]);
 };
 
 template<>
-uint8_t SpiPack<BitOrder::MsbFirst>::mask(uint8_t byte, uint8_t idx) {
-  uint8_t mask = {0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
+uint8_t SpiPack<MsbFirst>::mask(uint8_t byte, uint8_t idx) {
+  uint8_t mask[] = {0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
   return mask[idx] & byte;
 }
 
 template<>
-uint8_t SpiPack<BitOrder::LsbFirst>::mask(uint8_t byte, uint8_t idx) {
-  uint8_t mask = {0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
+uint8_t SpiPack<LsbFirst>::mask(uint8_t byte, uint8_t idx) {
+  uint8_t mask[] = {0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
   return mask[idx] & byte;
 }
 
 template<>
-uint8_t SpiPack<BitOrder::MsbFirst>::pack(uint8_t bits)
+uint8_t SpiPack<MsbFirst>::pack(uint8_t bits[])
 {
   return (bits[0] << 7 | bits[1] << 6 | bits[2] << 5 | bits[3] << 4 | bits[4] << 3 | \
           bits[5] << 2 | bits[6] << 1 | bits[7]);
 }
 
 template<>
-uint8_t SpiPack<BitOrder::LsbFirst>::pack(uint8_t bits)
+uint8_t SpiPack<LsbFirst>::pack(uint8_t bits[])
 {
   return (bits[0] | bits[1] << 1 | bits[2] << 2 | bits[3] << 3 | bits[4] << 4 | \
-          bits[5] << 5 | bits[6] << 6 | bits[7] << 7)
+          bits[5] << 5 | bits[6] << 6 | bits[7] << 7);
 }
 
 // ========================================================================== //
 // SPI Xfer
 // ========================================================================== //
-template <Polarity CPOL == Polarity::Std, Poll CPHA = Poll::Rising>
+template <PollEdge CPHA = Rising>
 struct SpiXfer {
-  uint8_t xfer_cycle(bool bit);
+
+  template <class Clock>
+  uint8_t xfer_cycle(Clock clock, bool bit);
 };
 
 template <>
-template <Pin MOSI, Pin MISO, class Clock>
-uint8_t SpiXfer<Polarity::Std>::xfer_cycle(Clock class, bool bit)
+template <class Clock>
+uint8_t SpiXfer<Falling>::xfer_cycle<Clock>(Clock clock, bool bit)
 {
   bool read;
 
@@ -105,7 +112,7 @@ uint8_t SpiXfer<Polarity::Std>::xfer_cycle(Clock class, bool bit)
   clock.tock();
   digitalWrite(mosi, !!(b & msk[_bit]));
 
-  // when Poll == Falling (CPOL=1) data will be captured at falling edge
+  // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
   clock.delayCyclesP1(); //  propagation
   clock.tick();
 
@@ -119,8 +126,8 @@ uint8_t SpiXfer<Polarity::Std>::xfer_cycle(Clock class, bool bit)
 }
 
 template <>
-template <Pin MOSI, Pin MISO, class Clock>
-uint8_t SpiXfer<Polarity::Inv>::xfer_cycle(Clock class, bool bit)
+template <class Clock>
+uint8_t SpiXfer<Rising>::xfer_cycle(Clock clock, bool bit)
 {
   bool read;
   // changing MOSI big while SCK low, propogation
