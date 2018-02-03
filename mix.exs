@@ -48,18 +48,10 @@ defmodule Pru.Mixfile do
         env_var: "PRU_LIB",
         build_link_path: "",
         boostrap_override: fn pkg -> System.put_env("PRU_LIB", pkg.path <> "/priv" ) end,
-
-        # build_path_link: "ti-cgt-pru",
-        # build_script: "build.sh",
-        # clean_files: [ "ti-cgt-pru" ],
       ],
       platform_config: [
       ],
       target_tuple: :arm_unknown_linux_gnueabihf,
-      # artifact_sites: [
-        # {:github_releases, "elcritch/extras_toolchain_pru_cgt"}
-      # ],
-      # checksum: package_files()
     ]
   end
 
