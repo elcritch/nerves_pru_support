@@ -23,7 +23,7 @@ defmodule Pru.Mixfile do
        aliases:  [
         "deps.get": ["deps.get", "nerves.deps.get"],
         "compile": ["nerves.env", "compile"],
-        # "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"]
+        "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"]
       ],
       deps: deps()
     ]
