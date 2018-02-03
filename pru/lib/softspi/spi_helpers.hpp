@@ -110,12 +110,12 @@ template <PollEdge CPHA = Rising>
 struct SpiXfer {
 
   template <class Clock>
-  uint8_t xfer_cycle(Clock clock, bool bit);
+  static uint8_t xfer_cycle(Clock clock, IOPins pins, bool bit);
 };
 
 template <>
 template <class Clock>
-uint8_t SpiXfer<Falling>::xfer_cycle<Clock>(Clock clock, bool bit)
+uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, bool bit)
 {
   bool read;
 
@@ -123,14 +123,14 @@ uint8_t SpiXfer<Falling>::xfer_cycle<Clock>(Clock clock, bool bit)
   clock.delayCyclesP0();
 
   clock.tock();
-  digitalWrite(mosi, !!(b & msk[_bit]));
+  digitalWrite(pins.mosi, bit);
 
   // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
   clock.delayCyclesP1(); //  propagation
   clock.tick();
 
   clock.delayCyclesC0(); // holding low, so there is enough time for data preparation and changing
-  read = digitalRead(miso); // reading at the middle of SCK pulse
+  read = digitalRead(pins.miso); // reading at the middle of SCK pulse
 
   // wait until data is fetched by slave device,  while SCK low, checking DATAsheet for this interval
   clock.delayCyclesC1();
@@ -140,11 +140,11 @@ uint8_t SpiXfer<Falling>::xfer_cycle<Clock>(Clock clock, bool bit)
 
 template <>
 template <class Clock>
-uint8_t SpiXfer<Rising>::xfer_cycle(Clock clock, bool bit)
+uint8_t SpiXfer<Rising>::xfer_cycle(Clock clock, IOPins pins, bool bit)
 {
   bool read;
   // changing MOSI big while SCK low, propogation
-  digitalWrite(MOSI, bit);
+  digitalWrite(pins.mosi, bit);
 
   // there is a requirement of LOW and HIGH have identical interval!
   clock.delayCyclesP1();
@@ -152,7 +152,7 @@ uint8_t SpiXfer<Rising>::xfer_cycle(Clock clock, bool bit)
 
   // reading at the middle of SCK pulse
   clock.delayCyclesC0();
-  read = digitalRead(MISO); // reading at the middle of SCK pulse
+  read = digitalRead(pins.miso); // reading at the middle of SCK pulse
 
   // wait until data is fetched by slave device,  while SCK high, checking DATAsheet for this interval
   clock.delayCyclesC1();

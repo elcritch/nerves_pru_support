@@ -35,7 +35,7 @@
 #ifndef NOOP
 // __nop();
 // __asm__("nop\n\t");
-#define NOOP() __delay_cycles(1000)
+#define NOOP __delay_cycles(1)
 #endif
 
 template <Polarity CPOL = Std,
@@ -45,6 +45,7 @@ struct SoftSPI {
 
   typedef SpiClock<CPOL> Clock;
   typedef SpiPack<BITEND> Packer;
+  typedef SpiXfer<CPHA> Xfer;
 
   IOPins pins;
   ClockTimings timings;
@@ -52,37 +53,34 @@ struct SoftSPI {
 
   SoftSPI(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings) {}
 
-  uint8_t xfer_cycle(uint8_t b); // member template
-
-  void start() {
-    spi_select();
-    clock.tick(IOPins::SCK());
-  }
-
-  inline void select() { gpio_write(cs, LOW); }
-  inline void unselect() { gpio_write(cs, HIGH); }
+  inline void select(Pin cs) { digitalWrite(cs, LOW); }
+  inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
   inline void delayCycles(int cycles) {
-    for (int i = 0; i++; i < cycles) {
-      NOOP();
+    for (int i = 0; i < cycles; ++i) {
+      NOOP;
     }
   }
 
-  uint8_t transfer(uint8_t b) {
+  uint8_t transfer(Pin cs, uint8_t b) {
     uint8_t reply = 0;
     char bits[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // reading buffer
 
+    select(cs);
+    clock.tick(pins.sck);
+
     // here, delay is added, to make CPHA=1 and CPHA=0 both work!
     clock.delayCyclesDelayCycles(); // checking timing characteristics, need delay
-    // from CS to rising edge?
+
     uint8_t idx;
     for (idx = 0; idx < 8; idx++) {
-      SpiXfer.xfer_cycle<IOPins, Clock>( Packer::mask(b, idx) );
+      Xfer::template xfer_cycle<IOPins, Clock>( pins, Packer::mask(b, idx) );
     }
 
-    clock::delayCycles(); // checking timing characteristics, it is no
+    clock.delayCycles(); // checking timing characteristics, it is no
+
     // needed by AD7730, from CS to rising edge
-    unselect();
+    unselect(cs);
 
     reply = Packer::pack(bits);
 
