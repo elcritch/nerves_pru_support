@@ -60,7 +60,7 @@ defmodule Pru.Mixfile do
     [
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:elixir_make, "~> 0.4.0", runtime: false},
-      {:toolchain_extras_pru_cgt, "~> 0.2", git: "https://github.com/elcritch/extras_toolchain_pru_cgt.git", branch: "master"},
+      {:toolchain_extras_pru_cgt, "~> 0.2", github: "elcritch/extras_toolchain_pru_cgt", branch: "master"},
     ]
   end
 
