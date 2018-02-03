@@ -47,8 +47,8 @@ struct SoftSPI {
   typedef SpiPack<BITEND> Packer;
   typedef SpiXfer<CPHA> Xfer;
 
-  IOPins pins;
-  ClockTimings timings;
+  const IOPins pins;
+  const ClockTimings timings;
   Clock clock;
 
   SoftSPI(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings) {}

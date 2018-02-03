@@ -7,7 +7,7 @@ INCLUDE=-I../../pru/include -I../../pru/lib/softspi
 GEN_DIR=gen
 LIB_DIR=../../pru/lib/softspi/
 
-CFLAGS= -O1 -g -DPRU_SUPPORT_OVERRIDE_R30 -DPRU_SUPPORT_OVERRIDE_R31
+CFLAGS= -O1 -g  -std=c++11  -DPRU_SUPPORT_OVERRIDE_R30 -DPRU_SUPPORT_OVERRIDE_R31
 
 TARGET=$(GEN_DIR)/$(PROJ_NAME)
 SOURCES=$(wildcard *.cpp)
@@ -33,7 +33,7 @@ $(TARGET): $(OBJECTS)
 	@echo ''
 	@echo 'Building target: $@'
 	@echo 'Invoking: PRU Archiver'
-	$(CXX) -o $(TARGET) $(OBJECTS)
+	$(CXX) $(CFLAGS) -o $(TARGET) $(OBJECTS)
 	@echo 'Finished building target: $@'
 	@echo ''
 	@echo 'Output files can be found in the "$(GEN_DIR)" directory'

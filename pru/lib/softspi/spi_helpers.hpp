@@ -23,9 +23,9 @@ enum PollEdge {
 typedef uint32_t Pin;
 
 struct IOPins {
-  const Pin miso;
-  const Pin mosi;
-  const Pin sck;
+  Pin miso;
+  Pin mosi;
+  Pin sck;
 };
 
 struct ClockTimings {
@@ -42,8 +42,8 @@ struct ClockTimings {
 template <Polarity CPOL>
 struct SpiClock {
 
-  Pin sck;
-  ClockTimings timings;
+  const Pin sck;
+  const ClockTimings timings;
 
   SpiClock(Pin _s, ClockTimings& _t) : sck(_s), timings(_t) {}
   void tick();
