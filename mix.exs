@@ -46,7 +46,7 @@ defmodule Pru.Mixfile do
       platform: Nerves.System.ToolchainExtras,
       toolchain_extras: [
         env_var: "PRU_LIB",
-        boostrap_override: fn pkg -> System.put_env("PRU_LIB", pkg.path) end,
+        boostrap_override: fn pkg -> System.put_env("PRU_LIB", pkg.path <> "/priv") end,
 
         # build_path_link: "ti-cgt-pru",
         # build_script: "build.sh",
