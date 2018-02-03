@@ -29,11 +29,11 @@ struct IOPins {
 };
 
 struct ClockTimings {
-  const uint8_t r0;
-  const uint8_t p0;
-  const uint8_t p1;
-  const uint8_t c0;
-  const uint8_t c1;
+  const uint32_t r0;
+  const uint32_t p0;
+  const uint32_t p1;
+  const uint32_t c0;
+  const uint32_t c1;
 };
 
 // ========================================================================== //
@@ -45,14 +45,22 @@ struct SpiClock {
   const Pin sck;
   const ClockTimings timings;
 
-  SpiClock(Pin _s, ClockTimings& _t) : sck(_s), timings(_t) {}
+  SpiClock(Pin _s, ClockTimings _t) : sck(_s), timings(_t) {}
   void tick();
   void tock();
-  void delayCycles();
-  void delayCyclesP0();
-  void delayCyclesP1();
-  void delayCyclesC0();
-  void delayCyclesC1();
+
+  inline void delayCycles(uint32_t cycles) {
+    uint32_t i;
+    for (i = 0; i < cycles; ++i) {
+      NOOP;
+    }
+  }
+
+  void delayCycles() { delayCycles(timings.r0); }
+  void delayCyclesP0() { delayCycles(timings.p0); }
+  void delayCyclesP1() { delayCycles(timings.p1); }
+  void delayCyclesC0() { delayCycles(timings.c0); }
+  void delayCyclesC1() { delayCycles(timings.c1); }
 };
 
 //  clock inverted

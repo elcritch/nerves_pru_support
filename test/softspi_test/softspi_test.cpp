@@ -17,12 +17,25 @@ struct PinState {
   uint32_t other_pin;
   bool other_state;
 
+  uint32_t cycle;
+
   PinState() {
     miso = false;
     mosi = false;
     sck = false;
     other_pin = 0;
     other_state = false;
+  }
+
+  void print() {
+    std::cout << "PinState<";
+    std::cout << "miso = " << miso << ", ";
+    std::cout << "mosi = " << mosi << ", ";
+    std::cout << "sck = " << sck << ", ";
+    std::cout << "x-pin = " << other_pin << ", ";
+    std::cout << "x-state = " << other_state << ", ";
+    std::cout << "cycle = " << cycle << ">";
+    std::cout << std::endl;
   }
 };
 
@@ -51,16 +64,33 @@ struct SimpleCycleTiming {
     }
   }
 
+  bool get_pin(Pin pin) {
+    if (pin == pins.mosi)
+      return this->current.mosi;
+    else if (pin == pins.miso)
+      return this->current.miso;
+    else if (pin == pins.sck)
+      return this->current.sck;
+    else if (pin == current.other_pin) 
+      return this->current.other_state;
+    else
+      throw std::invalid_argument("pin error");
+  }
+
   void incr() {
     this->states[cycle++] = this->current;
     this->current = PinState();
+    this->current.cycle = cycle;
   }
 };
 
 
 void delay_test_cycles();
+void digitalWrite(uint32_t gpio_bitmask, bool state);
+bool digitalRead(uint32_t gpio_bitmask);
 
 #define NOOP delay_test_cycles()
+#define PRU_SUPPORT_OVERRIDE_GPIO_FUNCS
 
 #include <softspi.hpp>
 
@@ -71,6 +101,13 @@ void delay_test_cycles() {
 }
 
 
+void digitalWrite(uint32_t gpio_bitmask, bool state) {
+  cycle_data.set_pin(gpio_bitmask, state);
+}
+bool digitalRead(uint32_t gpio_bitmask) {
+  return cycle_data.get_pin(gpio_bitmask);
+}
+
 int main() {
 
   IOPins pins = { .miso = 10, .mosi = 11, .sck = 14 };
@@ -80,6 +117,15 @@ int main() {
   cycle_data.pins = pins;
 
   std::cout << "Running..." << std::endl;
+
+  spi.transfer(7, 0xAA);
+
+  std::cout << "Done..." << std::endl;
+
+  for (int idx = 0; idx < cycle_data.cycle; idx++) {
+    cycle_data.states[idx].print();
+  }
+
   return 0;
 };
 

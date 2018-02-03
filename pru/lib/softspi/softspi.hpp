@@ -56,25 +56,20 @@ struct SoftSPI {
   inline void select(Pin cs) { digitalWrite(cs, LOW); }
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
-  inline void delayCycles(int cycles) {
-    for (int i = 0; i < cycles; ++i) {
-      NOOP;
-    }
-  }
 
   uint8_t transfer(Pin cs, uint8_t b) {
     uint8_t reply = 0;
-    char bits[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // reading buffer
+    uint8_t bits[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // reading buffer
 
     select(cs);
-    clock.tick(pins.sck);
+    clock.tick();
 
     // here, delay is added, to make CPHA=1 and CPHA=0 both work!
-    clock.delayCyclesDelayCycles(); // checking timing characteristics, need delay
+    clock.delayCycles(); // checking timing characteristics, need delay
 
     uint8_t idx;
     for (idx = 0; idx < 8; idx++) {
-      Xfer::template xfer_cycle<IOPins, Clock>( pins, Packer::mask(b, idx) );
+      Xfer::xfer_cycle( clock, pins, Packer::mask(b, idx) );
     }
 
     clock.delayCycles(); // checking timing characteristics, it is no
