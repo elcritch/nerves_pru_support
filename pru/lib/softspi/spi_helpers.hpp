@@ -4,6 +4,11 @@
 #define _SOFTWARE_SPI_HELPERS_H
 
 #include <stdint.h>
+#include <iostream>
+
+#ifndef DEBUG_STMT
+#define debug(msg)
+#endif
 
 enum BitOrder {
   MsbFirst,
@@ -29,11 +34,27 @@ struct IOPins {
 };
 
 struct ClockTimings {
-  const uint32_t r0;
-  const uint32_t p0;
-  const uint32_t p1;
-  const uint32_t c0;
-  const uint32_t c1;
+  // more precise than micro second delay,
+  // 1/4 of SPI bus frequency , depends on MCU master clock,
+  const uint32_t sck_cycle;
+  // propogation pre
+  const uint32_t prop_pre;
+  // propogation post
+  const uint32_t prop_post;
+  // capture pre (SCK edge -> capture) usually smaller delay
+  const uint32_t capt_pre;
+  // capture post ( capture -> SCK edge)  usually bigger delay
+  const uint32_t capt_post;
+
+  ClockTimings()
+    : sck_cycle(0), prop_pre(0), prop_post(0), capt_pre(0), capt_post(0) {}
+
+  ClockTimings(uint32_t s0, uint32_t p0, uint32_t p1, uint32_t c0, uint32_t c1)
+    : sck_cycle(s0), prop_pre(p0), prop_post(p1), capt_pre(c0), capt_post(c1) {}
+
+  static ClockTimings with_sck_cycle_and_pre_delays(uint32_t sck_cycle, uint32_t prop_pre, uint32_t capt_pre) {
+    return ClockTimings(sck_cycle, prop_pre, sck_cycle/2-prop_pre, prop_pre, sck_cycle/2-capt_pre);
+  }
 };
 
 // ========================================================================== //
@@ -56,11 +77,11 @@ struct SpiClock {
     }
   }
 
-  void delayCycles() { delayCycles(timings.r0); }
-  void delayCyclesP0() { delayCycles(timings.p0); }
-  void delayCyclesP1() { delayCycles(timings.p1); }
-  void delayCyclesC0() { delayCycles(timings.c0); }
-  void delayCyclesC1() { delayCycles(timings.c1); }
+  void delayCycles() { delayCycles(timings.sck_cycle); }
+  void delayCyclesP0() { delayCycles(timings.prop_pre); }
+  void delayCyclesP1() { delayCycles(timings.prop_post); }
+  void delayCyclesC0() { delayCycles(timings.capt_pre); }
+  void delayCyclesC1() { delayCycles(timings.capt_post); }
 };
 
 //  clock inverted
@@ -71,9 +92,12 @@ void SpiClock<Inv>::tock() {  digitalWrite(sck, HIGH); }
 
 //  clock standard
 template<>
-void SpiClock<Std>::tick() {  digitalWrite(sck, HIGH); }
+void SpiClock<Std>::tick() {
+  debug("tick");
+  digitalWrite(sck, HIGH);
+}
 template<>
-void SpiClock<Std>::tock() {  digitalWrite(sck, LOW); }
+void SpiClock<Std>::tock() { debug("tock");  digitalWrite(sck, LOW); }
 
 
 // ========================================================================== //
@@ -93,7 +117,7 @@ uint8_t SpiPack<MsbFirst>::mask(uint8_t byte, uint8_t idx) {
 
 template<>
 uint8_t SpiPack<LsbFirst>::mask(uint8_t byte, uint8_t idx) {
-  uint8_t mask[] = {0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
+  uint8_t mask[] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
   return mask[idx] & byte;
 }
 
@@ -128,20 +152,23 @@ uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, bool bit)
   bool read;
 
   clock.tick();
-  clock.delayCyclesP0();
+  {
+    clock.delayCyclesP0();
+
+    digitalWrite(pins.mosi, bit);
+
+    // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
+    clock.delayCyclesP1(); //  propagation
+  }
 
   clock.tock();
-  digitalWrite(pins.mosi, bit);
+  {
+    clock.delayCyclesC0(); // holding low, so there is enough time for data preparation and changing
+    read = digitalRead(pins.miso); // reading at the middle of SCK pulse
 
-  // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
-  clock.delayCyclesP1(); //  propagation
-  clock.tick();
-
-  clock.delayCyclesC0(); // holding low, so there is enough time for data preparation and changing
-  read = digitalRead(pins.miso); // reading at the middle of SCK pulse
-
-  // wait until data is fetched by slave device,  while SCK low, checking DATAsheet for this interval
-  clock.delayCyclesC1();
+    // wait until data is fetched by slave device,  while SCK low, checking DATAsheet for this interval
+    clock.delayCyclesC1();
+  }
 
   return read;
 }
@@ -151,22 +178,30 @@ template <class Clock>
 uint8_t SpiXfer<Rising>::xfer_cycle(Clock clock, IOPins pins, bool bit)
 {
   bool read;
-  // changing MOSI big while SCK low, propogation
-  digitalWrite(pins.mosi, bit);
 
-  // there is a requirement of LOW and HIGH have identical interval!
-  clock.delayCyclesP1();
+  {
+    // changing MOSI big while SCK low, propogation
+    digitalWrite(pins.mosi, bit);
+
+    // there is a requirement of LOW and HIGH have identical interval!
+    clock.delayCyclesP1();
+  }
+
   clock.tick();
+  {
+    // reading at the middle of SCK pulse
+    clock.delayCyclesC0();
+    read = digitalRead(pins.miso); // reading at the middle of SCK pulse
 
-  // reading at the middle of SCK pulse
-  clock.delayCyclesC0();
-  read = digitalRead(pins.miso); // reading at the middle of SCK pulse
+    // wait until data is fetched by slave device,  while SCK high, checking DATAsheet for this interval
+    clock.delayCyclesC1();
 
-  // wait until data is fetched by slave device,  while SCK high, checking DATAsheet for this interval
-  clock.delayCyclesC1();
+  }
 
   clock.tock();
-  clock.delayCyclesP0(); // holding low, so there is enough time for data preparation and changing
+  {
+    clock.delayCyclesP0(); // holding low, so there is enough time for data preparation and changing
+  }
 
   return read;
 }

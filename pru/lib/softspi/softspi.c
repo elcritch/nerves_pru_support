@@ -61,35 +61,35 @@
       
       for(uint8_t _bit = 0;_bit < 8;_bit++)
       {
-      #if _CPHA
-        #if _CPOL 
+       #if _CPHA // cpha - falling edge
+        #if _CPOL // cpol -- inv
           digitalWrite(_SCK, LOW);  //  propagation at rising edge
-       #else
+        #else // cpol -- std
           digitalWrite(_SCK, HIGH);  // change this to LOW for CPOL=1
-       #endif
+        #endif
           digitalWrite(_SCK, HIGH);  // change this to LOW for CPOL=1
           delayCycles(DELAY_CYCLES_P0);    
       
           digitalWrite(_MOSI, !!(b & msk[_bit]));
           delayCycles(DELAY_CYCLES_P1); //  propagation
-       #if _CPOL 
+        #if _CPOL // cpol -- inv
          digitalWrite(_SCK, HIGH);  // data will be captured at falling edge
-       #else
+        #else // cpol -- std
           digitalWrite(_SCK, LOW);  
-       #endif
+        #endif
          delayCycles(DELAY_CYCLES_C0); // holding low, so there is enough time for data preparation and changing
       
          bits[_bit] = digitalRead(_MISO); // reading at the middle of SCK pulse
          delayCycles(DELAY_CYCLES_C1);  // wait until data is fetched by slave device,  while SCK low, checking DATAsheet for this interval 
       
-      #else
+       #else// cpha - rising edge
           // changing MOSI big while SCK low, propogation 
           digitalWrite(_MOSI, !!(b & msk[_bit]));
           delayCycles(DELAY_CYCLES_P1); // there is a requirement of LOW and HIGH have identical interval!
   
-        #if _CPOL
+        #if _CPOL// cpol -- inv
          digitalWrite(_SCK, LOW); 
-        #else
+        #else // cpol -- std
          digitalWrite(_SCK, HIGH);
         #endif
          delayCycles(DELAY_CYCLES_C0);    // 
@@ -97,9 +97,9 @@
          bits[_bit] = digitalRead(_MISO); // reading at the middle of SCK pulse
          delayCycles(DELAY_CYCLES_C1);  // wait until data is fetched by slave device,  while SCK high, checking DATAsheet for this interval 
          
-        #if _CPOL
+        #if _CPOL// cpol -- inv
           digitalWrite(_SCK, HIGH);
-        #else
+        #else // cpol -- std
          digitalWrite(_SCK, LOW);  // data will change at falling edge
         #endif
          delayCycles(DELAY_CYCLES_P0); // holding low, so there is enough time for data preparation and changing
