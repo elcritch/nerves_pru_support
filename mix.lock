@@ -3,6 +3,6 @@
   "earmark": {:hex, :earmark, "1.2.4", "99b637c62a4d65a20a9fb674b8cffb8baa771c04605a80c911c4418c69b75439", [:mix], [], "hexpm"},
   "elixir_make": {:hex, :elixir_make, "0.4.0", "992f38fabe705bb45821a728f20914c554b276838433349d4f2341f7a687cddf", [:mix], [], "hexpm"},
   "ex_doc": {:hex, :ex_doc, "0.18.2", "993e0a95e9fbb790ac54ea58e700b45b299bd48bc44b4ae0404f28161f37a83e", [:mix], [{:earmark, "~> 1.1", [hex: :earmark, repo: "hexpm", optional: false]}], "hexpm"},
-  "nerves": {:git, "https://github.com/elcritch/nerves.git", "b9daeb50b184e7dc294879b05c0ff5cb00d3490a", [branch: "host_tools_fork"]},
-  "toolchain_extras_pru_cgt": {:git, "https://github.com/elcritch/extras_toolchain_pru_cgt.git", "5514cf1a952920cd18aa961bf7ded52f7a190ea7", [branch: "v0.2.x-host_tools_fork"]},
+  "nerves": {:git, "https://github.com/elcritch/nerves.git", "d0c972613e3ccaa8408d4cc3b299e304f21f0df7", [branch: "host_tools_fork"]},
+  "toolchain_extras_pru_cgt": {:git, "https://github.com/elcritch/extras_toolchain_pru_cgt.git", "00214767c1c95fdaed364fa890cd179cc6112969", [branch: "v0.2.x-host_tools_fork"]},
 }

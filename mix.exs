@@ -19,13 +19,12 @@ defmodule Pru.Mixfile do
       # make_env: %{ "PRU_CGT" => System.user_home() <> "/.nerves/artifacts/extras_toolchain_pru_cgt-portable-0.1.0/ti-cgt-pru/"},
       start_permanent: Mix.env() == :prod,
       package: package(),
-      aliases: aliases(),
-       #aliases:  [
+      # aliases: aliases(),
+       aliases:  [
         "deps.get": ["deps.get", "nerves.deps.get"],
         "compile": ["nerves.env", "compile"],
-
         # "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"]
-      #],
+      ],
       deps: deps()
     ]
   end
@@ -43,7 +42,16 @@ defmodule Pru.Mixfile do
     [
       app: @app,
       name: @app,
-      type: :toolchain_support,
+      type: :extras_toolchain_support,
+      platform: Nerves.System.ToolchainExtras,
+      toolchain_extras: [
+        env_var: "PRU_LIB",
+        boostrap_override: fn pkg -> System.put_env("PRU_LIB", pkg.path) end,
+
+        # build_path_link: "ti-cgt-pru",
+        # build_script: "build.sh",
+        # clean_files: [ "ti-cgt-pru" ],
+      ],
       platform_config: [
       ],
       target_tuple: :arm_unknown_linux_gnueabihf,
