@@ -38,7 +38,8 @@
 #define NOOP __delay_cycles(1)
 #endif
 
-template <Polarity CPOL = Std,
+template <typename DataWord,
+          Polarity CPOL = Std,
           PollEdge CPHA = Rising,
           BitOrder BITEND = MsbFirst>
 struct SoftSPI {
@@ -57,9 +58,10 @@ struct SoftSPI {
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
 
-  uint8_t transfer(Pin cs, uint8_t b) {
-    uint8_t reply = 0;
-    uint8_t bits[8] = {0, 0, 0, 0, 0, 0, 0, 0}; // reading buffer
+  DataWord reply = 0;
+  DataWord bits[sizeof(DataWord)];
+
+  uint8_t transfer(Pin cs, DataWord b) {
 
     select(cs);
     clock.tick();
@@ -67,8 +69,11 @@ struct SoftSPI {
     // here, delay is added, to make CPHA=1 and CPHA=0 both work!
     clock.delayCycles(); // checking timing characteristics, need delay
 
+    // Check that your compiler unroll's this properly!
+    std::cout << "sizeof(DataWord): " << sizeof(DataWord) << std::endl;
+
     uint8_t idx;
-    for (idx = 0; idx < 8; idx++) {
+    for (idx = 0; idx < sizeof(DataWord)*8; idx++) {
       Xfer::xfer_cycle( clock, pins, Packer::mask(b, idx) );
     }
 

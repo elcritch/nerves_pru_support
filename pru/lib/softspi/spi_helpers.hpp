@@ -53,7 +53,11 @@ struct ClockTimings {
     : sck_cycle(s0), prop_pre(p0), prop_post(p1), capt_pre(c0), capt_post(c1) {}
 
   static ClockTimings with_sck_cycle_and_pre_delays(uint32_t sck_cycle, uint32_t prop_pre, uint32_t capt_pre) {
-    return ClockTimings(sck_cycle, prop_pre, sck_cycle/2-prop_pre, prop_pre, sck_cycle/2-capt_pre);
+    return ClockTimings(sck_cycle,
+                        prop_pre,
+                        sck_cycle/2-prop_pre,
+                        prop_pre-1,
+                        sck_cycle/2-capt_pre);
   }
 };
 
@@ -74,6 +78,7 @@ struct SpiClock {
     uint32_t i;
     for (i = 0; i < cycles; ++i) {
       NOOP;
+      debug("...");
     }
   }
 
@@ -86,9 +91,15 @@ struct SpiClock {
 
 //  clock inverted
 template<>
-void SpiClock<Inv>::tick() {  digitalWrite(sck, LOW); }
+void SpiClock<Inv>::tick() {
+  debug("tick");
+  digitalWrite(sck, LOW);
+}
 template<>
-void SpiClock<Inv>::tock() {  digitalWrite(sck, HIGH); }
+void SpiClock<Inv>::tock() {
+  debug("tock");
+  digitalWrite(sck, HIGH);
+}
 
 //  clock standard
 template<>
@@ -111,12 +122,14 @@ struct SpiPack {
 
 template<>
 uint8_t SpiPack<MsbFirst>::mask(uint8_t byte, uint8_t idx) {
+  debug("");
   uint8_t mask[] = {0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
   return mask[idx] & byte;
 }
 
 template<>
 uint8_t SpiPack<LsbFirst>::mask(uint8_t byte, uint8_t idx) {
+  debug("");
   uint8_t mask[] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
   return mask[idx] & byte;
 }
@@ -124,6 +137,7 @@ uint8_t SpiPack<LsbFirst>::mask(uint8_t byte, uint8_t idx) {
 template<>
 uint8_t SpiPack<MsbFirst>::pack(uint8_t bits[])
 {
+  debug("");
   return (bits[0] << 7 | bits[1] << 6 | bits[2] << 5 | bits[3] << 4 | bits[4] << 3 | \
           bits[5] << 2 | bits[6] << 1 | bits[7]);
 }
@@ -131,6 +145,7 @@ uint8_t SpiPack<MsbFirst>::pack(uint8_t bits[])
 template<>
 uint8_t SpiPack<LsbFirst>::pack(uint8_t bits[])
 {
+  debug("");
   return (bits[0] | bits[1] << 1 | bits[2] << 2 | bits[3] << 3 | bits[4] << 4 | \
           bits[5] << 5 | bits[6] << 6 | bits[7] << 7);
 }

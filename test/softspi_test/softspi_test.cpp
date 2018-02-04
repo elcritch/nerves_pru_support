@@ -105,9 +105,12 @@ void delay_test_cycles() {
 
 void digitalWrite(uint32_t gpio_bitmask, bool state) {
   cycle_data.set_pin(gpio_bitmask, state);
+  // cycle_data.incr();
 }
 bool digitalRead(uint32_t gpio_bitmask) {
-  return cycle_data.get_pin(gpio_bitmask);
+  bool res = cycle_data.get_pin(gpio_bitmask);
+  // cycle_data.incr();
+  return res;
 }
 
 void debug(std::string msg) {
@@ -119,7 +122,7 @@ void debug(std::string msg) {
 int main() {
 
   IOPins pins = { .miso = 10, .mosi = 11, .sck = 14 };
-  ClockTimings timings = ClockTimings::with_sck_cycle_and_pre_delays(10, 2, 2);
+  ClockTimings timings = ClockTimings::with_sck_cycle_and_pre_delays(10, 1, 1);
 
   // ClockTimings timings = {
   //   .sck_delay = 10,
@@ -129,7 +132,7 @@ int main() {
   //   .capt_post = 1
   // };
 
-  SoftSPI<Std, Falling, MsbFirst> spi(pins, timings);
+  SoftSPI<uint8_t, Std, Falling, MsbFirst> spi(pins, timings);
 
   cycle_data.pins = pins;
 
