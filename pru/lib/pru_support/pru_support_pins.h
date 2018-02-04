@@ -19,7 +19,7 @@
  * referenced anywhere in software, the user would use the number 88, not 24!
  */
 
-#ifdef BB_BLACK | BB_GREEN
+/* #ifdef BB_BLACK | BB_GREEN */
 
 /* P8 */
 #define PRU0_GO_P8_11 0x08000 /* r30, 1 << 15, GPIO1[13], GpioUserland 45 */
@@ -89,6 +89,6 @@
 // PRU0_UART0_TXD_P9_24 0x10000 /* GPIO1[15], GpioUserland 15 */
 // PRU1_UART0_RXD_P9_26 0x10000 /* GPIO1[14], GpioUserland 14 */
 
-#endif
+/* #endif */
 
 #endif
