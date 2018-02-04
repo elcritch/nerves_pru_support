@@ -14,6 +14,8 @@ SOURCES=$(wildcard *.cpp)
 #Using .object instead of .obj in order to not conflict with the CCS build process
 OBJECTS=$(patsubst %,$(GEN_DIR)/%,$(SOURCES:.cpp=.o))
 
+test: all
+
 all: printStart $(TARGET) printEnd
 
 printStart:
