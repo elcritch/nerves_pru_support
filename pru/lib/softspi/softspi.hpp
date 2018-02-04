@@ -31,6 +31,9 @@
 #define HIGH true
 #endif
 
+#ifndef GPIO_WRITE
+#define spi_gpio_write digitalWrite
+#endif
 
 #ifndef NOOP
 // __nop();
@@ -53,8 +56,8 @@ struct SoftSPI {
 
   SoftSPI(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings) {}
 
-  inline void select(Pin cs) { digitalWrite(cs, LOW); }
-  inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
+  inline void select(Pin cs) { spi_gpio_write(cs, LOW); }
+  inline void unselect(Pin cs) { spi_gpio_write(cs, HIGH); }
 
 
   uint8_t transfer(Pin cs, uint8_t b) {

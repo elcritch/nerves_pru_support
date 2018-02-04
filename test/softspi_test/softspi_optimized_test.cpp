@@ -103,6 +103,11 @@ void delay_test_cycles() {
 }
 
 
+#define GPIO_WRITER
+void gpio_write(uint32_t gpio_bitmask, bool state) {
+  return gpio_bitmask 
+}
+
 void digitalWrite(uint32_t gpio_bitmask, bool state) {
   cycle_data.set_pin(gpio_bitmask, state);
 }
