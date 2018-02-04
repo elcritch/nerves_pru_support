@@ -177,7 +177,7 @@ int main() {
   // };
 
   // Mode 0
-  SoftSPI<uint8_t, Std, Rising, MsbFirst> spi0(pins, timings);
+  SoftSPI<uint8_t, Polarity::Std, PollEdge::Rising, MsbFirst> spi0(pins, timings);
 
   cycle_data = SimpleCycleTiming<IOPins, Pin>();
   cycle_data.pins = pins;
@@ -188,7 +188,7 @@ int main() {
   printCycleData();
 
   // Mode 1
-  SoftSPI<uint8_t, Std, Falling, MsbFirst> spi1(pins, timings);
+  SoftSPI<uint8_t, Polarity::Std, PollEdge::Falling, MsbFirst> spi1(pins, timings);
 
   cycle_data = SimpleCycleTiming<IOPins, Pin>();
   cycle_data.pins = pins;
@@ -196,6 +196,50 @@ int main() {
   std::cout << "\nRunning... mode 1" << std::endl;
 
   spi1.transfer(8, 0xAA);
+  printCycleData();
+
+  // Mode 2
+  SoftSPI<uint8_t, Polarity::Inv, PollEdge::Rising, MsbFirst> spi2(pins, timings);
+
+  cycle_data = SimpleCycleTiming<IOPins, Pin>();
+  cycle_data.pins = pins;
+
+  std::cout << "\nRunning... mode 2" << std::endl;
+
+  spi2.transfer(7, 0xAA);
+  printCycleData();
+
+  // Mode 3
+  SoftSPI<uint8_t, Polarity::Inv, PollEdge::Falling, MsbFirst> spi3(pins, timings);
+
+  cycle_data = SimpleCycleTiming<IOPins, Pin>();
+  cycle_data.pins = pins;
+
+  std::cout << "\nRunning... mode 3" << std::endl;
+
+  spi3.transfer(8, 0xAA);
+  printCycleData();
+
+  // Mode 0 - MSB
+  SoftSPI<uint8_t, Polarity::Std, PollEdge::Rising, MsbFirst> spi0msb(pins, timings);
+
+  cycle_data = SimpleCycleTiming<IOPins, Pin>();
+  cycle_data.pins = pins;
+
+  std::cout << "\nRunning... mode 0 / msb / 0xAF" << std::endl;
+
+  spi0msb.transfer(8, 0xAF);
+  printCycleData();
+
+  // Mode 0 - LSB
+  SoftSPI<uint8_t, Polarity::Std, PollEdge::Rising, LsbFirst> spi0lsb(pins, timings);
+
+  cycle_data = SimpleCycleTiming<IOPins, Pin>();
+  cycle_data.pins = pins;
+
+  std::cout << "\nRunning... mode 0 / lsb / 0xAF" << std::endl;
+
+  spi0lsb.transfer(8, 0xAF);
   printCycleData();
 
   return 0;
