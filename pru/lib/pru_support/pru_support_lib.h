@@ -11,6 +11,36 @@ extern "C" {
 #include <stdbool.h>
 #include <pru_types.h>
 
+/*
+ * http://processors.wiki.ti.com/index.php/AM335x_PRU_Read_Latencies
+ *
+ *
+ * Summary: Read Latencies for AM335x PRU-ICSS
+ *
+ * - PRU write instructions are fire-and-forget, and execute in ~1 cycle
+ * - PRU read instructions execute in ~2 cycles
+ *    + Additional read latencies occur by traversing through interconnect layers
+ *    + Rule of thumb, MMRs that are "closer" to the PRU will have lower access latencies.
+ *    + These latencies account for 2 cycle instruction and interconnect introduced latency.
+ *    + Note memory accesses outside of the PRU subsystem are not deterministic.
+ *
+ * |==================|========================|
+ * |      MMRs        |     Read Latency       |
+ * |                  | (PRU cycles @ 200MHz)  |
+ * |==================|========================|
+ * | PRU CTRL         |          4             |
+ * | PRU CFG 	        |          3             |
+ * | PRU INTC         |          3             |
+ * | PRU DRAM         |          3             |
+ * | PRU Shared DRAM  |          3             |
+ * | PRU ECAP         |          4             |
+ * | PRU UART         |         14             |
+ * | PRU IEP          |         12             |
+ * | PRU R31 (GPI)    |          1             |
+ * |==================|=====================================|
+ *
+ *
+ */
 
 #define PAD_ONE   10
 #define PAD_TWO   11
