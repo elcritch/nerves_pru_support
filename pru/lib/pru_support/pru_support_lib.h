@@ -90,12 +90,15 @@ volatile register uint32_t __R31;
 #endif
 
 #ifndef PRU_SUPPORT_OVERRIDE_GPIO_FUNCS
-// seems to be 3-4 cycles (15 - 20 ns then)
 inline void digitalWrite(uint32_t gpio_bitmask, uint32_t state) {
+  // 1 cycle read for R30, 1 inst for &, 1 inst for ^, 1 for ^, and 1 for =
+  // est. to be 5 cycles (~20 ns)
   __R30 ^= gpio_bitmask & ( __R30 ^ state);
 }
 
 inline bool digitalRead(uint32_t gpio_bitmask) {
+  // 1 cycle read for R31, 1 inst for &, 1 inst for gt
+  // est. 3 cycles
   return (__R31 & gpio_bitmask) > 0;
 }
 #endif
