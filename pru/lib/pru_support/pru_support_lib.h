@@ -39,6 +39,7 @@ extern "C" {
  * | PRU R31 (GPI)    |          1             |
  * |==================|=====================================|
  *
+ * PRU INTC => timing for reading interrupts
  *
  */
 
