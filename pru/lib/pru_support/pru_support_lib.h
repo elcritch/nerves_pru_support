@@ -12,7 +12,8 @@ extern "C" {
 #include <pru_types.h>
 
 /*
- * http://processors.wiki.ti.com/index.php/AM335x_PRU_Read_Latencies
+ * - [AM335x PRU Read Latencies](http://processors.wiki.ti.com/index.php/AM335x_PRU_Read_Latencies)
+ * - [Ti AM33XX PRUSSv2](https://elinux.org/Ti_AM33XX_PRUSSv2#PRU_to_internal_peripherals)
  *
  *
  * Summary: Read Latencies for AM335x PRU-ICSS
@@ -71,13 +72,6 @@ extern "C" {
 #define __SHARED_MEMORY__(SHARED_STRUCT, NAME) \
   volatile SHARED_STRUCT* NAME = (volatile SHARED_STRUCT *) PRU_SHAREDMEM_ADDR;
 
-/* Toggle GPO pins
-   https://github.com/derekmolloy/boneDeviceTree/blob/master/docs/BeagleboneBlackP8HeaderTable.pdf
-   https://github.com/derekmolloy/boneDeviceTree/blob/master/docs/BeagleboneBlackP9HeaderTable.pdf
-   Use these tables to find the correct pin address
-*/
-
-#define P8_11 = 0x834
 
 #define HOST_INT_2			((uint32_t) 1 << 30)
 #define HOST_INT_1			((uint32_t) 1 << 31)
