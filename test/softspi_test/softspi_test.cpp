@@ -114,31 +114,11 @@ bool digitalRead(uint32_t gpio_bitmask) {
 }
 
 void debug(std::string msg) {
-  std::cout << "cycle: " << cycle_data.cycle << std::endl;
-  std::cout << msg << std::endl;
+  // std::cout << "cycle: " << cycle_data.cycle << std::endl;
+  // std::cout << msg << std::endl;
 }
 
-
-int main() {
-
-  IOPins pins = { .miso = 10, .mosi = 11, .sck = 14 };
-  ClockTimings timings = ClockTimings::with_sck_cycle_and_pre_delays(10, 1, 1);
-
-  // ClockTimings timings = {
-  //   .sck_delay = 10,
-  //   .prop_pre  = 2,
-  //   .prop_post = 2,
-  //   .capt_pre  = 1,
-  //   .capt_post = 1
-  // };
-
-  SoftSPI<uint8_t, Std, Falling, MsbFirst> spi(pins, timings);
-
-  cycle_data.pins = pins;
-
-  std::cout << "Running..." << std::endl;
-
-  spi.transfer(7, 0xAA);
+void printCycleDataFull() {
 
   std::cout << "Done..." << std::endl;
 
@@ -149,22 +129,25 @@ int main() {
   std::cout << std::endl;
   std::cout << std::endl;
 
+}
+
+void printCycleData() {
   std::cout << "sck:  " ;
   for (int i=0; i < cycle_data.cycle; i++) {
-    std::cout << (i % timings.sck_cycle == 0 ? " " : "");
+    // std::cout << (i % timings.sck_cycle == 0 ? " " : "");
     std::cout << cycle_data.states[i].sck ;
   }
   std::cout << std::endl;
   std::cout << "mosi: " ;
   for (int i=0; i < cycle_data.cycle; i++) {
-    std::cout << (i % timings.sck_cycle == 0 ? " " : "");
+    // std::cout << (i % timings.sck_cycle == 0 ? " " : "");
     std::cout << cycle_data.states[i].mosi ;
   }
   std::cout << std::endl;
 
   std::cout << "miso: " ;
   for (int i=0; i < cycle_data.cycle; i++) {
-    std::cout << (i % timings.sck_cycle == 0 ? " " : "");
+    // std::cout << (i % timings.sck_cycle == 0 ? " " : "");
     std::cout << cycle_data.states[i].miso ;
   }
   std::cout << std::endl;
@@ -172,11 +155,49 @@ int main() {
 
   std::cout << "cs:   " ;
   for (int i=0; i < cycle_data.cycle; i++) {
-    std::cout << (i % timings.sck_cycle == 0 ? " " : "");
+    // std::cout << (i % timings.sck_cycle == 0 ? " " : "");
     std::cout << cycle_data.states[i].other_state ;
   }
   std::cout << std::endl;
 
-  return 0;
 };
+
+
+int main() {
+
+  IOPins pins = { .miso = 10, .mosi = 11, .sck = 14 };
+  ClockTimings timings = ClockTimings::with_sck_cycle_and_pre_delays(10, 0, 0);
+
+  // ClockTimings timings = {
+  //   .sck_delay = 10,
+  //   .prop_pre  = 2,
+  //   .prop_post = 2,
+  //   .capt_pre  = 1,
+  //   .capt_post = 1
+  // };
+
+  // Mode 0
+  SoftSPI<uint8_t, Std, Rising, MsbFirst> spi0(pins, timings);
+
+  cycle_data = SimpleCycleTiming<IOPins, Pin>();
+  cycle_data.pins = pins;
+
+  std::cout << "\nRunning... mode 0" << std::endl;
+
+  spi0.transfer(7, 0xAA);
+  printCycleData();
+
+  // Mode 1
+  SoftSPI<uint8_t, Std, Falling, MsbFirst> spi1(pins, timings);
+
+  cycle_data = SimpleCycleTiming<IOPins, Pin>();
+  cycle_data.pins = pins;
+
+  std::cout << "\nRunning... mode 1" << std::endl;
+
+  spi1.transfer(8, 0xAA);
+  printCycleData();
+
+  return 0;
+}
 

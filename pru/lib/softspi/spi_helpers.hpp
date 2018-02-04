@@ -10,29 +10,6 @@
 #define debug(msg)
 #endif
 
-enum BitOrder {
-  MsbFirst,
-  LsbFirst,
-};
-
-enum Polarity {
-  Std,
-  Inv,
-};
-
-enum PollEdge {
-  Rising,
-  Falling,
-};
-
-typedef uint32_t Pin;
-
-struct IOPins {
-  Pin miso;
-  Pin mosi;
-  Pin sck;
-};
-
 struct ClockTimings {
   // more precise than micro second delay,
   // 1/4 of SPI bus frequency , depends on MCU master clock,
@@ -56,7 +33,7 @@ struct ClockTimings {
     return ClockTimings(sck_cycle,
                         prop_pre,
                         sck_cycle/2-prop_pre,
-                        prop_pre-1,
+                        prop_pre,
                         sck_cycle/2-capt_pre);
   }
 };
@@ -108,7 +85,10 @@ void SpiClock<Std>::tick() {
   digitalWrite(sck, HIGH);
 }
 template<>
-void SpiClock<Std>::tock() { debug("tock");  digitalWrite(sck, LOW); }
+void SpiClock<Std>::tock() {
+  debug("tock");
+  digitalWrite(sck, LOW);
+}
 
 
 // ========================================================================== //
@@ -167,23 +147,22 @@ uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, bool bit)
   bool read;
 
   clock.tick();
-  {
-    clock.delayCyclesP0();
 
-    digitalWrite(pins.mosi, bit);
+  clock.delayCyclesP0();
 
-    // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
-    clock.delayCyclesP1(); //  propagation
-  }
+  digitalWrite(pins.mosi, bit);
+
+  // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
+  clock.delayCyclesP1(); //  propagation
 
   clock.tock();
-  {
-    clock.delayCyclesC0(); // holding low, so there is enough time for data preparation and changing
-    read = digitalRead(pins.miso); // reading at the middle of SCK pulse
 
-    // wait until data is fetched by slave device,  while SCK low, checking DATAsheet for this interval
-    clock.delayCyclesC1();
-  }
+  clock.delayCyclesC0(); // holding low, so there is enough time for data preparation and changing
+
+  read = digitalRead(pins.miso); // reading at the middle of SCK pulse
+
+  // wait until data is fetched by slave device,  while SCK low, checking DATAsheet for this interval
+  clock.delayCyclesC1();
 
   return read;
 }
@@ -194,29 +173,23 @@ uint8_t SpiXfer<Rising>::xfer_cycle(Clock clock, IOPins pins, bool bit)
 {
   bool read;
 
-  {
-    // changing MOSI big while SCK low, propogation
-    digitalWrite(pins.mosi, bit);
+  // changing MOSI big while SCK low, propogation
+  digitalWrite(pins.mosi, bit);
 
-    // there is a requirement of LOW and HIGH have identical interval!
-    clock.delayCyclesP1();
-  }
+  // there is a requirement of LOW and HIGH have identical interval!
+  clock.delayCyclesP1();
 
   clock.tick();
-  {
-    // reading at the middle of SCK pulse
-    clock.delayCyclesC0();
-    read = digitalRead(pins.miso); // reading at the middle of SCK pulse
+  // reading at the middle of SCK pulse
+  clock.delayCyclesC0();
 
-    // wait until data is fetched by slave device,  while SCK high, checking DATAsheet for this interval
-    clock.delayCyclesC1();
+  read = digitalRead(pins.miso); // reading at the middle of SCK pulse
 
-  }
+  // wait until data is fetched by slave device,  while SCK high, checking DATAsheet for this interval
+  clock.delayCyclesC1();
 
   clock.tock();
-  {
-    clock.delayCyclesP0(); // holding low, so there is enough time for data preparation and changing
-  }
+  clock.delayCyclesP0(); // holding low, so there is enough time for data preparation and changing
 
   return read;
 }

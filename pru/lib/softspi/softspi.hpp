@@ -22,6 +22,30 @@
 #define _SOFTWARE_SPI_H
 
 #include <pru_support_lib.h>
+
+enum BitOrder {
+  MsbFirst,
+  LsbFirst,
+};
+
+enum Polarity {
+  Std,
+  Inv,
+};
+
+enum PollEdge {
+  Rising,
+  Falling,
+};
+
+typedef uint32_t Pin;
+
+struct IOPins {
+  Pin miso;
+  Pin mosi;
+  Pin sck;
+};
+
 #include "spi_helpers.hpp"
 
 #ifndef LOW
@@ -63,15 +87,14 @@ struct SoftSPI {
 
   uint8_t transfer(Pin cs, DataWord b) {
 
+    // Start xfer cycle
     select(cs);
-    clock.tick();
+    clock.tock();
 
-    // here, delay is added, to make CPHA=1 and CPHA=0 both work!
-    clock.delayCycles(); // checking timing characteristics, need delay
+    // Here, delay is added, to make CPHA=1 and CPHA=0 both work!
+    clock.delayCycles();
 
     // Check that your compiler unroll's this properly!
-    std::cout << "sizeof(DataWord): " << sizeof(DataWord) << std::endl;
-
     uint8_t idx;
     for (idx = 0; idx < sizeof(DataWord)*8; idx++) {
       Xfer::xfer_cycle( clock, pins, Packer::mask(b, idx) );
