@@ -13,7 +13,7 @@ extern "C" {
 
 /*
  * - [AM335x PRU Read Latencies](http://processors.wiki.ti.com/index.php/AM335x_PRU_Read_Latencies)
- * - [Ti AM33XX PRUSSv2](https://elinux.org/Ti_AM33XX_PRUSSv2#PRU_to_internal_peripherals)
+ * - [Ti AM33XX PRUSSv2](https://elinux.org/Ti_AM33XX_PRUSSv2)
  *
  *
  * Summary: Read Latencies for AM335x PRU-ICSS
