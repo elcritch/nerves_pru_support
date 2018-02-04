@@ -97,7 +97,7 @@ struct SoftSPI {
     // Check that your compiler unroll's this properly!
     uint8_t idx;
     for (idx = 0; idx < sizeof(DataWord)*8; idx++) {
-      Xfer::xfer_cycle( clock, pins, Packer::mask(b, idx) );
+      bits[idx] = Xfer::xfer_cycle( clock, pins, Packer::mask(b, idx) );
     }
 
     clock.delayCycles(); // checking timing characteristics, it is no

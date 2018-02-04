@@ -55,8 +55,10 @@ struct SimpleCycleTiming {
   SimpleCycleTiming(IOPins _p) : pins(_p) {}
 
   void set_pin(Pin pin, bool state) {
-    if (pin == pins.mosi)
+    if (pin == pins.mosi) {
       this->current.mosi = state;
+      this->current.miso = !state;
+    }
     else if (pin == pins.miso)
       this->current.miso = state;
     else if (pin == pins.sck)
@@ -131,7 +133,8 @@ void printCycleDataFull() {
 
 }
 
-void printCycleData() {
+#include <bitset>
+void printCycleData(uint8_t out) {
   std::cout << "sck:  " ;
   for (int i=0; i < cycle_data.cycle; i++) {
     // std::cout << (i % timings.sck_cycle == 0 ? " " : "");
@@ -160,6 +163,9 @@ void printCycleData() {
   }
   std::cout << std::endl;
 
+  std::cout << "read out: " << (int) out << " binary: ";
+  std::cout<<std::bitset<8>(out)<<std::endl;
+
 };
 
 
@@ -167,6 +173,7 @@ int main() {
 
   IOPins pins = { .miso = 10, .mosi = 11, .sck = 14 };
   ClockTimings timings = ClockTimings::with_sck_cycle_and_pre_delays(10, 0, 0);
+  uint8_t out;
 
   // ClockTimings timings = {
   //   .sck_delay = 10,
@@ -184,8 +191,8 @@ int main() {
 
   std::cout << "\nRunning... mode 0" << std::endl;
 
-  spi0.transfer(7, 0xAA);
-  printCycleData();
+  out = spi0.transfer(7, 0xAA);
+  printCycleData(out);
 
   // Mode 1
   SoftSPI<uint8_t, Polarity::Std, PollEdge::Falling, MsbFirst> spi1(pins, timings);
@@ -195,8 +202,8 @@ int main() {
 
   std::cout << "\nRunning... mode 1" << std::endl;
 
-  spi1.transfer(8, 0xAA);
-  printCycleData();
+  out = spi1.transfer(8, 0xAA);
+  printCycleData(out);
 
   // Mode 2
   SoftSPI<uint8_t, Polarity::Inv, PollEdge::Rising, MsbFirst> spi2(pins, timings);
@@ -206,8 +213,8 @@ int main() {
 
   std::cout << "\nRunning... mode 2" << std::endl;
 
-  spi2.transfer(7, 0xAA);
-  printCycleData();
+  out = spi2.transfer(7, 0xAA);
+  printCycleData(out);
 
   // Mode 3
   SoftSPI<uint8_t, Polarity::Inv, PollEdge::Falling, MsbFirst> spi3(pins, timings);
@@ -217,8 +224,8 @@ int main() {
 
   std::cout << "\nRunning... mode 3" << std::endl;
 
-  spi3.transfer(8, 0xAA);
-  printCycleData();
+  out = spi3.transfer(8, 0xAA);
+  printCycleData(out);
 
   // Mode 0 - MSB
   SoftSPI<uint8_t, Polarity::Std, PollEdge::Rising, MsbFirst> spi0msb(pins, timings);
@@ -228,8 +235,8 @@ int main() {
 
   std::cout << "\nRunning... mode 0 / msb / 0xAF" << std::endl;
 
-  spi0msb.transfer(8, 0xAF);
-  printCycleData();
+  out = spi0msb.transfer(8, 0xAF);
+  printCycleData(out);
 
   // Mode 0 - LSB
   SoftSPI<uint8_t, Polarity::Std, PollEdge::Rising, LsbFirst> spi0lsb(pins, timings);
@@ -239,8 +246,8 @@ int main() {
 
   std::cout << "\nRunning... mode 0 / lsb / 0xAF" << std::endl;
 
-  spi0lsb.transfer(8, 0xAF);
-  printCycleData();
+  out = spi0lsb.transfer(8, 0xAF);
+  printCycleData(out);
 
   return 0;
 }

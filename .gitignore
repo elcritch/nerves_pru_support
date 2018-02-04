@@ -27,3 +27,4 @@ elixir_ale-*.tar
 *.o
 *.lib
 gen/
+.#*
