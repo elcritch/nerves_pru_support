@@ -4,6 +4,19 @@
 
 /** Header Defs from:
  * https://vadl.github.io/beagleboneblack/2016/07/29/setting-up-bbb-gpio
+ *
+ * ## GPIO Numbering Scheme
+ *
+ * The gpio pins of the bbb are grouped into 3 groups of 32: GPIO0, GPIO1,
+ * and GPIO2. An individual pin can be refered to using the convention GPIOX_Y
+ * where X is its gpio register and Y is its number within that register.
+ * However, all references to a particular pin made in software instead uses
+ * its absolute pin number! A gpio’s absolute pin number is calculated in the
+ * following manner: Z = 32*X + Y where X is again the gpio register and Y is
+ * the position within that register.
+ *
+ * i.e. GPIO2_24 is 32*2+24, making it GPIO_88. If this pin were to be
+ * referenced anywhere in software, the user would use the number 88, not 24!
  */
 
 #ifdef BB_BLACK
