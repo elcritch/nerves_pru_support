@@ -14,6 +14,7 @@ extern "C" {
 /*
  * - [AM335x PRU Read Latencies](http://processors.wiki.ti.com/index.php/AM335x_PRU_Read_Latencies)
  * - [Ti AM33XX PRUSSv2](https://elinux.org/Ti_AM33XX_PRUSSv2)
+ * - [PWM Example](https://gist.github.com/shirriff/2a7cf2f1adb37011da827f1c7f47b992)
  *
  *
  * Summary: Read Latencies for AM335x PRU-ICSS
