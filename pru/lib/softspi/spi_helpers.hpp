@@ -141,7 +141,6 @@ inline uint8_t SpiPack<MsbFirst>::pack(uint8_t bits[])
 template<>
 inline uint8_t SpiPack<LsbFirst>::pack(uint8_t bits[])
 {
-  debug("");
   return (bits[0] | bits[1] << 1 | bits[2] << 2 | bits[3] << 3 | bits[4] << 4 | \
           bits[5] << 5 | bits[6] << 6 | bits[7] << 7);
 }
