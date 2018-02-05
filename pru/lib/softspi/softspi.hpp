@@ -23,6 +23,9 @@
 
 #include <pru_support_lib.h>
 
+
+namespace SoftSPI {
+
 enum BitOrder {
   MsbFirst,
   LsbFirst,
@@ -46,6 +49,8 @@ struct IOPins {
   Pin sck;
 };
 
+}
+
 #include "spi_helpers.hpp"
 
 #ifndef LOW
@@ -62,12 +67,15 @@ struct IOPins {
 #define NOOP __delay_cycles(1)
 #endif
 
+namespace SoftSPI {
+
+
 template <typename DataWord,
           Polarity CPOL = Std,
           PollEdge CPHA = Rising,
           BitOrder BITEND = MsbFirst,
           class Clock = SpiClockToggler<CPOL>>
-struct SoftSPI {
+struct SpiMaster {
 
   // typedef ClockClass Clock;
   typedef SpiPack<BITEND> Packer;
@@ -77,7 +85,7 @@ struct SoftSPI {
   const ClockTimings timings;
   Clock clock;
 
-  SoftSPI(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings) {}
+  SpiMaster(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings) {}
 
   inline void select(Pin cs) { digitalWrite(cs, LOW); }
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
@@ -118,5 +126,6 @@ struct SoftSPI {
   // mode 1: SCK idle low, phase: reading at middle of SCK LOW pulse
   // this big-bang should work for both  CPHA=1  and CPHA=0
 
+}
 
 #endif

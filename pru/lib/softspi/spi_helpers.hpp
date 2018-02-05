@@ -10,6 +10,9 @@
 #define debug(msg)
 #endif
 
+namespace SoftSPI {
+
+
 struct ClockTimings {
   // more precise than micro second delay,
   // 1/4 of SPI bus frequency , depends on MCU master clock,
@@ -214,6 +217,8 @@ uint8_t SpiXfer<Rising>::xfer_cycle(Clock clock, IOPins pins, bool bit)
   clock.delayCyclesP0(); // holding low, so there is enough time for data preparation and changing
 
   return read;
+}
+
 }
 
 #endif // header
