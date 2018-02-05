@@ -122,7 +122,7 @@ struct SpiPack {
 };
 
 template<>
-uint8_t SpiPack<MsbFirst>::mask(uint8_t byte, uint8_t idx, const uint32_t word_size) {
+inline uint8_t SpiPack<MsbFirst>::mask(uint8_t byte, uint8_t idx, const uint32_t word_size) {
   return (16*word_size >> idx) & byte;
 }
 
@@ -139,7 +139,7 @@ inline uint8_t SpiPack<MsbFirst>::pack(uint8_t bits[])
 }
 
 template<>
-uint8_t SpiPack<LsbFirst>::pack(uint8_t bits[])
+inline uint8_t SpiPack<LsbFirst>::pack(uint8_t bits[])
 {
   debug("");
   return (bits[0] | bits[1] << 1 | bits[2] << 2 | bits[3] << 3 | bits[4] << 4 | \
