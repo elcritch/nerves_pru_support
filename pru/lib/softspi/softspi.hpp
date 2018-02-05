@@ -85,18 +85,18 @@ struct SpiMaster {
   const ClockTimings timings;
   Clock clock;
 
-  uint32_t cycles;
+  uint64_t __xfers;
 
-  SpiMaster(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings), cycles(0) {}
+  SpiMaster(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings), __xfers(0) {}
 
   inline void select(Pin cs) { digitalWrite(cs, LOW); }
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
+  const uint8_t word_size = 8*sizeof(DataWord);
 
   uint8_t transfer(Pin cs, DataWord b) {
-    DataWord reply;
-    DataWord bits[sizeof(DataWord)];
-    cycles++;
+    DataWord bits[word_size];
+    this->__xfers++;
 
     // Start xfer cycle
     select(cs);
@@ -106,7 +106,6 @@ struct SpiMaster {
     clock.delayCycles();
 
     // Check that your compiler unroll's this properly!
-    const uint8_t word_size = 8*sizeof(DataWord);
 
     uint8_t idx;
     for (idx = 0; idx < word_size; idx++) {
@@ -118,9 +117,7 @@ struct SpiMaster {
     // needed by AD7730, from CS to rising edge
     unselect(cs);
 
-    reply = Packer::pack(bits);
-
-    return reply;
+    return Packer::pack(bits);
   }
 };
 

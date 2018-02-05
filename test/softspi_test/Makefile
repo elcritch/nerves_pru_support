@@ -6,6 +6,7 @@ INCLUDE=-I../../pru/include -I../../pru/lib/softspi
 #-----------------------------------
 LIB_DIR=../../pru/lib/softspi/
 
+CXX=clang++ # gcc 7.2 seems to break currently on the transfer loop where sizeof(...) is used. 
 CFLAGS= -O3 -g  -std=c++11  -DPRU_SUPPORT_OVERRIDE_R30 -DPRU_SUPPORT_OVERRIDE_R31
 
 SOURCES=$(wildcard *.cpp)
@@ -29,10 +30,10 @@ printEnd:
 	@echo ''
 
 # Invokes the archiver to make the .lib file
-%_test: %.o
+%_test: %.cpp
 	@echo ''
 	@echo 'Building target: $@'
-	$(CXX) $(CFLAGS) -o $@ $<
+	$(CXX) $(INCLUDE) $(CFLAGS) -o $@ $<
 	@echo 'Finished building target: $@'
 	@echo ''
 

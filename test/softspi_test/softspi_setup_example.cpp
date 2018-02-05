@@ -45,6 +45,7 @@ void digitalToggle(uint32_t gpio_bitmask) {
 }
 
 
+#include <bitset>
 
 int main() {
 
@@ -60,7 +61,9 @@ int main() {
   out = spi0.transfer(7, 0xAA);
 
 
-  std::cout << "\nDone: cout: " << out << std::endl;
+  std::cout << "\nDone: cout: " ;
+
+  std::cout<<std::bitset<8>(out)<<std::endl;
 
   return 0;
 }
