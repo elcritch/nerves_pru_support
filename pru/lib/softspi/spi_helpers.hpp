@@ -32,7 +32,7 @@ struct ClockTimings {
   ClockTimings(uint32_t s0, uint32_t p0, uint32_t p1, uint32_t c0, uint32_t c1)
     : sck_cycle(s0), prop_pre(p0), prop_post(p1), capt_pre(c0), capt_post(c1) {}
 
-  static ClockTimings with_sck_cycle_and_pre_delays(uint32_t sck_cycle, uint32_t prop_pre, uint32_t capt_pre) {
+  static inline ClockTimings with_sck_cycle_and_pre_delays(uint32_t sck_cycle, uint32_t prop_pre, uint32_t capt_pre) {
     return ClockTimings(sck_cycle,
                         prop_pre,
                         sck_cycle/2-prop_pre,
@@ -121,8 +121,8 @@ inline void SpiClock<Std>::stop() {
 // ========================================================================== //
 template <BitOrder BITEND>
 struct SpiPack {
-  inline static uint8_t mask(uint8_t byte, uint8_t idx);
-  inline static uint8_t pack(uint8_t bits[]);
+  inline uint8_t mask(uint8_t byte, uint8_t idx);
+  inline uint8_t pack(uint8_t bits[]);
 };
 
 template<>
@@ -162,7 +162,7 @@ template <PollEdge CPHA = Rising>
 struct SpiXfer {
 
   template <class Clock>
-  static uint8_t xfer_cycle(Clock clock, IOPins pins, bool bit);
+  inline uint8_t xfer_cycle(Clock clock, IOPins pins, bool bit);
 };
 
 template <>

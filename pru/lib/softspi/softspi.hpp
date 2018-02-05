@@ -84,6 +84,8 @@ struct SpiMaster {
   const IOPins pins;
   const ClockTimings timings;
   Clock clock;
+  Xfer xfer;
+  Packer packer;
 
   uint64_t __xfers;
 
@@ -109,7 +111,7 @@ struct SpiMaster {
 
     uint8_t idx;
     for (idx = 0; idx < word_size; idx++) {
-      bits[idx] = Xfer::xfer_cycle( clock, pins, Packer::mask(b, idx) );
+      bits[idx] = xfer.xfer_cycle( clock, pins, packer.mask(b, idx) );
     }
 
     clock.delayCycles(); // checking timing characteristics, it is no
@@ -117,7 +119,7 @@ struct SpiMaster {
     // needed by AD7730, from CS to rising edge
     unselect(cs);
 
-    return Packer::pack(bits);
+    return packer.pack(bits);
   }
 };
 
