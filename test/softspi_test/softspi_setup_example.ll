@@ -4,6 +4,7 @@ target datalayout = "e-m:e-i64:64-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-linux-gnu"
 
 %"class.std::ios_base::Init" = type { i8 }
+%"struct.SoftSPI::ClockTimings" = type { i32, i32, i32, i32, i32 }
 %"class.std::basic_ostream" = type { i32 (...)**, %"class.std::basic_ios" }
 %"class.std::basic_ios" = type { %"class.std::ios_base", %"class.std::basic_ostream"*, i8, i8, %"class.std::basic_streambuf"*, %"class.std::ctype"*, %"class.std::num_put"*, %"class.std::num_get"* }
 %"class.std::ios_base" = type { i32 (...)**, i64, i64, i32, i32, i32, %"struct.std::ios_base::_Callback_list"*, %"struct.std::ios_base::_Words", [8 x %"struct.std::ios_base::_Words"], i32, %"struct.std::ios_base::_Words"*, %"class.std::locale" }
@@ -19,23 +20,21 @@ target triple = "x86_64-pc-linux-gnu"
 %struct.__locale_data = type opaque
 %"class.std::num_put" = type { %"class.std::locale::facet.base", [4 x i8] }
 %"class.std::num_get" = type { %"class.std::locale::facet.base", [4 x i8] }
-%"struct.SoftSPI::SpiMaster" = type { %"struct.SoftSPI::IOPins", %"struct.SoftSPI::ClockTimings", %"struct.SoftSPI::SpiClockToggler", i32 }
-%"struct.SoftSPI::IOPins" = type { i32, i32, i32 }
-%"struct.SoftSPI::ClockTimings" = type { i32, i32, i32, i32, i32 }
-%"struct.SoftSPI::SpiClockToggler" = type { %"struct.SoftSPI::SpiClock" }
-%"struct.SoftSPI::SpiClock" = type { i32, %"struct.SoftSPI::ClockTimings" }
+%"class.std::bitset" = type { %"struct.std::_Base_bitset" }
+%"struct.std::_Base_bitset" = type { i64 }
+%"class.std::__cxx11::basic_string" = type { %"struct.std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_Alloc_hider", i64, %union.anon }
+%"struct.std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_Alloc_hider" = type { i8* }
+%union.anon = type { i64, [8 x i8] }
 
-$_ZN7SoftSPI9SpiMasterIhLNS_8PolarityE0ELNS_8PollEdgeE0ELNS_8BitOrderE0ENS_15SpiClockTogglerEE8transferEjh = comdat any
+$_ZStlsIcSt11char_traitsIcELm32EERSt13basic_ostreamIT_T0_ES6_RKSt6bitsetIXT1_EE = comdat any
 
 @_ZStL8__ioinit = internal global %"class.std::ios_base::Init" zeroinitializer, align 1
 @__dso_handle = external global i8
 @__R30 = global i32 0, align 4
-@__R31 = global i32 0, align 4
-@_ZZN7SoftSPI7SpiPackILNS_8BitOrderE0EE4maskEhhE4mask = private unnamed_addr constant [8 x i8] c"\80@ \10\08\04\02\01", align 1
-@_ZZN7SoftSPI7SpiPackILNS_8BitOrderE1EE4maskEhhE4mask = private unnamed_addr constant [8 x i8] c"\01\02\04\08\10 @\80", align 1
+@_ZL7timings = internal global %"struct.SoftSPI::ClockTimings" zeroinitializer, align 16
 @_ZSt4cout = external global %"class.std::basic_ostream", align 8
 @.str = private unnamed_addr constant [19 x i8] c"\0ARunning... mode 0\00", align 1
-@.str.1 = private unnamed_addr constant [14 x i8] c"\0ADone: cout: \00", align 1
+@.str.2 = private unnamed_addr constant [14 x i8] c"\0ADone: cout: \00", align 1
 @llvm.global_ctors = appending global [1 x { i32, void ()*, i8* }] [{ i32, void ()*, i8* } { i32 65535, void ()* @_GLOBAL__sub_I_softspi_setup_example.cpp, i8* null }]
 
 declare void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"*) unnamed_addr #0
@@ -46,393 +45,430 @@ declare void @_ZNSt8ios_base4InitD1Ev(%"class.std::ios_base::Init"*) unnamed_add
 ; Function Attrs: nounwind
 declare i32 @__cxa_atexit(void (i8*)*, i8*, i8*) local_unnamed_addr #2
 
-; Function Attrs: norecurse nounwind readnone uwtable
-define zeroext i8 @_ZN7SoftSPI7SpiPackILNS_8BitOrderE0EE4maskEhh(i8 zeroext, i8 zeroext) local_unnamed_addr #3 align 2 {
-  %3 = zext i8 %1 to i64
-  %4 = getelementptr inbounds [8 x i8], [8 x i8]* @_ZZN7SoftSPI7SpiPackILNS_8BitOrderE0EE4maskEhhE4mask, i64 0, i64 %3
-  %5 = load i8, i8* %4, align 1, !tbaa !1
-  %6 = and i8 %5, %0
-  ret i8 %6
-}
-
-; Function Attrs: argmemonly nounwind
-declare void @llvm.lifetime.start(i64, i8* nocapture) #4
-
-; Function Attrs: argmemonly nounwind
-declare void @llvm.lifetime.end(i64, i8* nocapture) #4
-
-; Function Attrs: norecurse nounwind readnone uwtable
-define zeroext i8 @_ZN7SoftSPI7SpiPackILNS_8BitOrderE1EE4maskEhh(i8 zeroext, i8 zeroext) local_unnamed_addr #3 align 2 {
-  %3 = zext i8 %1 to i64
-  %4 = getelementptr inbounds [8 x i8], [8 x i8]* @_ZZN7SoftSPI7SpiPackILNS_8BitOrderE1EE4maskEhhE4mask, i64 0, i64 %3
-  %5 = load i8, i8* %4, align 1, !tbaa !1
-  %6 = and i8 %5, %0
-  ret i8 %6
-}
-
-; Function Attrs: norecurse nounwind readonly uwtable
-define zeroext i8 @_ZN7SoftSPI7SpiPackILNS_8BitOrderE0EE4packEPh(i8* nocapture readonly) local_unnamed_addr #5 align 2 {
-  %2 = load i8, i8* %0, align 1, !tbaa !1
-  %3 = shl i8 %2, 7
-  %4 = getelementptr inbounds i8, i8* %0, i64 1
-  %5 = load i8, i8* %4, align 1, !tbaa !1
-  %6 = shl i8 %5, 6
-  %7 = or i8 %6, %3
-  %8 = getelementptr inbounds i8, i8* %0, i64 2
-  %9 = load i8, i8* %8, align 1, !tbaa !1
-  %10 = shl i8 %9, 5
-  %11 = or i8 %7, %10
-  %12 = getelementptr inbounds i8, i8* %0, i64 3
-  %13 = load i8, i8* %12, align 1, !tbaa !1
-  %14 = shl i8 %13, 4
-  %15 = or i8 %11, %14
-  %16 = getelementptr inbounds i8, i8* %0, i64 4
-  %17 = load i8, i8* %16, align 1, !tbaa !1
-  %18 = shl i8 %17, 3
-  %19 = or i8 %15, %18
-  %20 = getelementptr inbounds i8, i8* %0, i64 5
-  %21 = load i8, i8* %20, align 1, !tbaa !1
-  %22 = shl i8 %21, 2
-  %23 = or i8 %19, %22
-  %24 = getelementptr inbounds i8, i8* %0, i64 6
-  %25 = load i8, i8* %24, align 1, !tbaa !1
-  %26 = shl i8 %25, 1
-  %27 = or i8 %23, %26
-  %28 = getelementptr inbounds i8, i8* %0, i64 7
-  %29 = load i8, i8* %28, align 1, !tbaa !1
-  %30 = or i8 %27, %29
-  ret i8 %30
-}
-
-; Function Attrs: norecurse nounwind readonly uwtable
-define zeroext i8 @_ZN7SoftSPI7SpiPackILNS_8BitOrderE1EE4packEPh(i8* nocapture readonly) local_unnamed_addr #5 align 2 {
-  %2 = load i8, i8* %0, align 1, !tbaa !1
-  %3 = getelementptr inbounds i8, i8* %0, i64 1
-  %4 = load i8, i8* %3, align 1, !tbaa !1
-  %5 = shl i8 %4, 1
-  %6 = or i8 %5, %2
-  %7 = getelementptr inbounds i8, i8* %0, i64 2
-  %8 = load i8, i8* %7, align 1, !tbaa !1
-  %9 = shl i8 %8, 2
-  %10 = or i8 %6, %9
-  %11 = getelementptr inbounds i8, i8* %0, i64 3
-  %12 = load i8, i8* %11, align 1, !tbaa !1
-  %13 = shl i8 %12, 3
-  %14 = or i8 %10, %13
-  %15 = getelementptr inbounds i8, i8* %0, i64 4
-  %16 = load i8, i8* %15, align 1, !tbaa !1
-  %17 = shl i8 %16, 4
-  %18 = or i8 %14, %17
-  %19 = getelementptr inbounds i8, i8* %0, i64 5
-  %20 = load i8, i8* %19, align 1, !tbaa !1
-  %21 = shl i8 %20, 5
-  %22 = or i8 %18, %21
-  %23 = getelementptr inbounds i8, i8* %0, i64 6
-  %24 = load i8, i8* %23, align 1, !tbaa !1
-  %25 = shl i8 %24, 6
-  %26 = or i8 %22, %25
-  %27 = getelementptr inbounds i8, i8* %0, i64 7
-  %28 = load i8, i8* %27, align 1, !tbaa !1
-  %29 = shl i8 %28, 7
-  %30 = or i8 %26, %29
-  ret i8 %30
-}
-
 ; Function Attrs: norecurse nounwind uwtable
-define void @_Z12digitalWritejj(i32, i32) local_unnamed_addr #6 {
-  %3 = load volatile i32, i32* @__R30, align 4, !tbaa !4
+define void @_Z12digitalWritejj(i32, i32) local_unnamed_addr #3 {
+  %3 = load volatile i32, i32* @__R30, align 4, !tbaa !1
   %4 = xor i32 %3, %1
   %5 = and i32 %4, %0
-  %6 = load volatile i32, i32* @__R30, align 4, !tbaa !4
+  %6 = load volatile i32, i32* @__R30, align 4, !tbaa !1
   %7 = xor i32 %5, %6
-  store volatile i32 %7, i32* @__R30, align 4, !tbaa !4
+  store volatile i32 %7, i32* @__R30, align 4, !tbaa !1
   ret void
 }
 
 ; Function Attrs: norecurse nounwind uwtable
-define zeroext i1 @_Z11digitalReadj(i32) local_unnamed_addr #6 {
-  %2 = load volatile i32, i32* @__R31, align 4, !tbaa !4
+define zeroext i1 @_Z11digitalReadj(i32) local_unnamed_addr #3 {
+  %2 = load volatile i32, i32* @__R30, align 4, !tbaa !1
   %3 = and i32 %2, %0
   %4 = icmp ne i32 %3, 0
   ret i1 %4
 }
 
 ; Function Attrs: norecurse nounwind uwtable
-define void @_Z13digitalTogglej(i32) local_unnamed_addr #6 {
-  %2 = load volatile i32, i32* @__R30, align 4, !tbaa !4
+define void @_Z13digitalTogglej(i32) local_unnamed_addr #3 {
+  %2 = load volatile i32, i32* @__R30, align 4, !tbaa !1
   %3 = xor i32 %2, %0
-  store volatile i32 %3, i32* @__R30, align 4, !tbaa !4
+  store volatile i32 %3, i32* @__R30, align 4, !tbaa !1
   ret void
 }
 
+; Function Attrs: argmemonly nounwind
+declare {}* @llvm.invariant.start.p0i8(i64, i8* nocapture) #4
+
 ; Function Attrs: norecurse uwtable
-define i32 @main() local_unnamed_addr #7 {
-  %1 = alloca i8, align 1
-  %2 = alloca %"struct.SoftSPI::SpiMaster", align 8
-  %3 = bitcast %"struct.SoftSPI::SpiMaster"* %2 to i8*
-  call void @llvm.lifetime.start(i64 60, i8* nonnull %3) #2
-  %4 = bitcast %"struct.SoftSPI::SpiMaster"* %2 to i64*
-  store i64 47244640266, i64* %4, align 8
-  %5 = getelementptr inbounds %"struct.SoftSPI::SpiMaster", %"struct.SoftSPI::SpiMaster"* %2, i64 0, i32 0, i32 2
-  %6 = bitcast i32* %5 to <4 x i32>*
-  store <4 x i32> <i32 14, i32 10, i32 0, i32 5>, <4 x i32>* %6, align 8
-  %7 = getelementptr inbounds %"struct.SoftSPI::SpiMaster", %"struct.SoftSPI::SpiMaster"* %2, i64 0, i32 1, i32 3
-  %8 = bitcast i32* %7 to <4 x i32>*
-  store <4 x i32> <i32 0, i32 5, i32 14, i32 10>, <4 x i32>* %8, align 4
-  %9 = getelementptr inbounds %"struct.SoftSPI::SpiMaster", %"struct.SoftSPI::SpiMaster"* %2, i64 0, i32 2, i32 0, i32 1, i32 1
-  %10 = bitcast i32* %9 to <4 x i32>*
-  store <4 x i32> <i32 0, i32 5, i32 0, i32 5>, <4 x i32>* %10, align 4
-  %11 = getelementptr inbounds %"struct.SoftSPI::SpiMaster", %"struct.SoftSPI::SpiMaster"* %2, i64 0, i32 3
-  store i32 0, i32* %11, align 8, !tbaa !6
-  %12 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str, i64 0, i64 0), i64 18)
-  %13 = load i8*, i8** bitcast (%"class.std::basic_ostream"* @_ZSt4cout to i8**), align 8, !tbaa !11
-  %14 = getelementptr i8, i8* %13, i64 -24
-  %15 = bitcast i8* %14 to i64*
-  %16 = load i64, i64* %15, align 8
-  %17 = getelementptr inbounds i8, i8* bitcast (%"class.std::basic_ostream"* @_ZSt4cout to i8*), i64 %16
-  %18 = getelementptr inbounds i8, i8* %17, i64 240
-  %19 = bitcast i8* %18 to %"class.std::ctype"**
-  %20 = load %"class.std::ctype"*, %"class.std::ctype"** %19, align 8, !tbaa !13
-  %21 = icmp eq %"class.std::ctype"* %20, null
-  br i1 %21, label %22, label %23
+define i32 @main() local_unnamed_addr #5 personality i32 (...)* @__gxx_personality_v0 {
+  %1 = alloca %"class.std::bitset", align 8
+  %2 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([19 x i8], [19 x i8]* @.str, i64 0, i64 0), i64 18)
+  %3 = load i8*, i8** bitcast (%"class.std::basic_ostream"* @_ZSt4cout to i8**), align 8, !tbaa !5
+  %4 = getelementptr i8, i8* %3, i64 -24
+  %5 = bitcast i8* %4 to i64*
+  %6 = load i64, i64* %5, align 8
+  %7 = getelementptr inbounds i8, i8* bitcast (%"class.std::basic_ostream"* @_ZSt4cout to i8*), i64 %6
+  %8 = getelementptr inbounds i8, i8* %7, i64 240
+  %9 = bitcast i8* %8 to %"class.std::ctype"**
+  %10 = load %"class.std::ctype"*, %"class.std::ctype"** %9, align 8, !tbaa !7
+  %11 = icmp eq %"class.std::ctype"* %10, null
+  br i1 %11, label %12, label %13
 
-; <label>:22:                                     ; preds = %0
-  tail call void @_ZSt16__throw_bad_castv() #10
+; <label>:12:                                     ; preds = %0
+  tail call void @_ZSt16__throw_bad_castv() #9
   unreachable
 
-; <label>:23:                                     ; preds = %0
-  %24 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %20, i64 0, i32 8
-  %25 = load i8, i8* %24, align 8, !tbaa !17
-  %26 = icmp eq i8 %25, 0
-  br i1 %26, label %30, label %27
+; <label>:13:                                     ; preds = %0
+  %14 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %10, i64 0, i32 8
+  %15 = load i8, i8* %14, align 8, !tbaa !11
+  %16 = icmp eq i8 %15, 0
+  br i1 %16, label %20, label %17
 
-; <label>:27:                                     ; preds = %23
-  %28 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %20, i64 0, i32 9, i64 10
-  %29 = load i8, i8* %28, align 1, !tbaa !1
-  br label %36
+; <label>:17:                                     ; preds = %13
+  %18 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %10, i64 0, i32 9, i64 10
+  %19 = load i8, i8* %18, align 1, !tbaa !13
+  br label %26
 
-; <label>:30:                                     ; preds = %23
-  tail call void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %20)
-  %31 = bitcast %"class.std::ctype"* %20 to i8 (%"class.std::ctype"*, i8)***
-  %32 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %31, align 8, !tbaa !11
-  %33 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %32, i64 6
-  %34 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %33, align 8
-  %35 = tail call signext i8 %34(%"class.std::ctype"* nonnull %20, i8 signext 10)
-  br label %36
+; <label>:20:                                     ; preds = %13
+  tail call void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %10)
+  %21 = bitcast %"class.std::ctype"* %10 to i8 (%"class.std::ctype"*, i8)***
+  %22 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %21, align 8, !tbaa !5
+  %23 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %22, i64 6
+  %24 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %23, align 8
+  %25 = tail call signext i8 %24(%"class.std::ctype"* nonnull %10, i8 signext 10)
+  br label %26
 
-; <label>:36:                                     ; preds = %27, %30
-  %37 = phi i8 [ %29, %27 ], [ %35, %30 ]
-  %38 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull @_ZSt4cout, i8 signext %37)
-  %39 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %38)
-  %40 = call zeroext i8 @_ZN7SoftSPI9SpiMasterIhLNS_8PolarityE0ELNS_8PollEdgeE0ELNS_8BitOrderE0ENS_15SpiClockTogglerEE8transferEjh(%"struct.SoftSPI::SpiMaster"* nonnull %2, i32 7, i8 zeroext -86)
-  %41 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([14 x i8], [14 x i8]* @.str.1, i64 0, i64 0), i64 13)
-  call void @llvm.lifetime.start(i64 1, i8* nonnull %1)
-  store i8 %40, i8* %1, align 1, !tbaa !1
-  %42 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull %1, i64 1)
-  call void @llvm.lifetime.end(i64 1, i8* nonnull %1)
-  %43 = bitcast %"class.std::basic_ostream"* %42 to i8**
-  %44 = load i8*, i8** %43, align 8, !tbaa !11
-  %45 = getelementptr i8, i8* %44, i64 -24
-  %46 = bitcast i8* %45 to i64*
-  %47 = load i64, i64* %46, align 8
-  %48 = bitcast %"class.std::basic_ostream"* %42 to i8*
-  %49 = getelementptr inbounds i8, i8* %48, i64 %47
-  %50 = getelementptr inbounds i8, i8* %49, i64 240
-  %51 = bitcast i8* %50 to %"class.std::ctype"**
-  %52 = load %"class.std::ctype"*, %"class.std::ctype"** %51, align 8, !tbaa !13
-  %53 = icmp eq %"class.std::ctype"* %52, null
-  br i1 %53, label %54, label %55
+; <label>:26:                                     ; preds = %20, %17
+  %27 = phi i8 [ %19, %17 ], [ %25, %20 ]
+  %28 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull @_ZSt4cout, i8 signext %27)
+  %29 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %28)
+  %30 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %31 = and i32 %30, 7
+  %32 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %33 = xor i32 %31, %32
+  store volatile i32 %33, i32* @__R30, align 4, !tbaa !1
+  %34 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %35 = xor i32 %34, 14
+  store volatile i32 %35, i32* @__R30, align 4, !tbaa !1
+  %36 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %37 = and i32 %36, 11
+  %38 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %39 = xor i32 %38, %37
+  %40 = xor i32 %39, 1
+  store volatile i32 %40, i32* @__R30, align 4, !tbaa !1
+  %41 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %42 = xor i32 %41, 14
+  store volatile i32 %42, i32* @__R30, align 4, !tbaa !1
+  %43 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %44 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %45 = xor i32 %44, 14
+  store volatile i32 %45, i32* @__R30, align 4, !tbaa !1
+  %46 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %47 = and i32 %46, 11
+  %48 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %49 = xor i32 %48, %47
+  store volatile i32 %49, i32* @__R30, align 4, !tbaa !1
+  %50 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %51 = xor i32 %50, 14
+  store volatile i32 %51, i32* @__R30, align 4, !tbaa !1
+  %52 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %53 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %54 = xor i32 %53, 14
+  store volatile i32 %54, i32* @__R30, align 4, !tbaa !1
+  %55 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %56 = and i32 %55, 11
+  %57 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %58 = xor i32 %57, %56
+  %59 = xor i32 %58, 1
+  store volatile i32 %59, i32* @__R30, align 4, !tbaa !1
+  %60 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %61 = xor i32 %60, 14
+  store volatile i32 %61, i32* @__R30, align 4, !tbaa !1
+  %62 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %63 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %64 = xor i32 %63, 14
+  store volatile i32 %64, i32* @__R30, align 4, !tbaa !1
+  %65 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %66 = and i32 %65, 11
+  %67 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %68 = xor i32 %67, %66
+  store volatile i32 %68, i32* @__R30, align 4, !tbaa !1
+  %69 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %70 = xor i32 %69, 14
+  store volatile i32 %70, i32* @__R30, align 4, !tbaa !1
+  %71 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %72 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %73 = xor i32 %72, 14
+  store volatile i32 %73, i32* @__R30, align 4, !tbaa !1
+  %74 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %75 = and i32 %74, 11
+  %76 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %77 = xor i32 %76, %75
+  %78 = xor i32 %77, 1
+  store volatile i32 %78, i32* @__R30, align 4, !tbaa !1
+  %79 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %80 = xor i32 %79, 14
+  store volatile i32 %80, i32* @__R30, align 4, !tbaa !1
+  %81 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %82 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %83 = xor i32 %82, 14
+  store volatile i32 %83, i32* @__R30, align 4, !tbaa !1
+  %84 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %85 = and i32 %84, 11
+  %86 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %87 = xor i32 %86, %85
+  store volatile i32 %87, i32* @__R30, align 4, !tbaa !1
+  %88 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %89 = xor i32 %88, 14
+  store volatile i32 %89, i32* @__R30, align 4, !tbaa !1
+  %90 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %91 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %92 = xor i32 %91, 14
+  store volatile i32 %92, i32* @__R30, align 4, !tbaa !1
+  %93 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %94 = and i32 %93, 11
+  %95 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %96 = xor i32 %95, %94
+  %97 = xor i32 %96, 1
+  store volatile i32 %97, i32* @__R30, align 4, !tbaa !1
+  %98 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %99 = xor i32 %98, 14
+  store volatile i32 %99, i32* @__R30, align 4, !tbaa !1
+  %100 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %101 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %102 = xor i32 %101, 14
+  store volatile i32 %102, i32* @__R30, align 4, !tbaa !1
+  %103 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %104 = and i32 %103, 11
+  %105 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %106 = xor i32 %105, %104
+  store volatile i32 %106, i32* @__R30, align 4, !tbaa !1
+  %107 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %108 = xor i32 %107, 14
+  store volatile i32 %108, i32* @__R30, align 4, !tbaa !1
+  %109 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %110 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %111 = xor i32 %110, 14
+  store volatile i32 %111, i32* @__R30, align 4, !tbaa !1
+  %112 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %113 = and i32 %112, 7
+  %114 = xor i32 %113, 7
+  %115 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %116 = xor i32 %114, %115
+  store volatile i32 %116, i32* @__R30, align 4, !tbaa !1
+  %117 = tail call dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, i8* nonnull getelementptr inbounds ([14 x i8], [14 x i8]* @.str.2, i64 0, i64 0), i64 13)
+  %118 = bitcast %"class.std::bitset"* %1 to i8*
+  call void @llvm.lifetime.start(i64 8, i8* nonnull %118) #2
+  %119 = load volatile i32, i32* @__R30, align 4, !tbaa !1
+  %120 = zext i32 %119 to i64
+  %121 = getelementptr inbounds %"class.std::bitset", %"class.std::bitset"* %1, i64 0, i32 0, i32 0
+  store i64 %120, i64* %121, align 8, !tbaa !14
+  %122 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZStlsIcSt11char_traitsIcELm32EERSt13basic_ostreamIT_T0_ES6_RKSt6bitsetIXT1_EE(%"class.std::basic_ostream"* nonnull dereferenceable(272) @_ZSt4cout, %"class.std::bitset"* nonnull dereferenceable(8) %1)
+  %123 = bitcast %"class.std::basic_ostream"* %122 to i8**
+  %124 = load i8*, i8** %123, align 8, !tbaa !5
+  %125 = getelementptr i8, i8* %124, i64 -24
+  %126 = bitcast i8* %125 to i64*
+  %127 = load i64, i64* %126, align 8
+  %128 = bitcast %"class.std::basic_ostream"* %122 to i8*
+  %129 = getelementptr inbounds i8, i8* %128, i64 %127
+  %130 = getelementptr inbounds i8, i8* %129, i64 240
+  %131 = bitcast i8* %130 to %"class.std::ctype"**
+  %132 = load %"class.std::ctype"*, %"class.std::ctype"** %131, align 8, !tbaa !7
+  %133 = icmp eq %"class.std::ctype"* %132, null
+  br i1 %133, label %134, label %135
 
-; <label>:54:                                     ; preds = %36
-  call void @_ZSt16__throw_bad_castv() #10
+; <label>:134:                                    ; preds = %26
+  call void @_ZSt16__throw_bad_castv() #9
   unreachable
 
-; <label>:55:                                     ; preds = %36
-  %56 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %52, i64 0, i32 8
-  %57 = load i8, i8* %56, align 8, !tbaa !17
-  %58 = icmp eq i8 %57, 0
-  br i1 %58, label %62, label %59
+; <label>:135:                                    ; preds = %26
+  %136 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %132, i64 0, i32 8
+  %137 = load i8, i8* %136, align 8, !tbaa !11
+  %138 = icmp eq i8 %137, 0
+  br i1 %138, label %142, label %139
 
-; <label>:59:                                     ; preds = %55
-  %60 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %52, i64 0, i32 9, i64 10
-  %61 = load i8, i8* %60, align 1, !tbaa !1
-  br label %68
+; <label>:139:                                    ; preds = %135
+  %140 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %132, i64 0, i32 9, i64 10
+  %141 = load i8, i8* %140, align 1, !tbaa !13
+  br label %148
 
-; <label>:62:                                     ; preds = %55
-  call void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %52)
-  %63 = bitcast %"class.std::ctype"* %52 to i8 (%"class.std::ctype"*, i8)***
-  %64 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %63, align 8, !tbaa !11
-  %65 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %64, i64 6
-  %66 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %65, align 8
-  %67 = call signext i8 %66(%"class.std::ctype"* nonnull %52, i8 signext 10)
-  br label %68
+; <label>:142:                                    ; preds = %135
+  call void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %132)
+  %143 = bitcast %"class.std::ctype"* %132 to i8 (%"class.std::ctype"*, i8)***
+  %144 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %143, align 8, !tbaa !5
+  %145 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %144, i64 6
+  %146 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %145, align 8
+  %147 = call signext i8 %146(%"class.std::ctype"* nonnull %132, i8 signext 10)
+  br label %148
 
-; <label>:68:                                     ; preds = %59, %62
-  %69 = phi i8 [ %61, %59 ], [ %67, %62 ]
-  %70 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %42, i8 signext %69)
-  %71 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %70)
-  call void @llvm.lifetime.end(i64 60, i8* nonnull %3) #2
+; <label>:148:                                    ; preds = %139, %142
+  %149 = phi i8 [ %141, %139 ], [ %147, %142 ]
+  %150 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.std::basic_ostream"* nonnull %122, i8 signext %149)
+  %151 = call dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"* nonnull %150)
+  call void @llvm.lifetime.end(i64 8, i8* nonnull %118) #2
   ret i32 0
 }
 
+; Function Attrs: argmemonly nounwind
+declare void @llvm.lifetime.start(i64, i8* nocapture) #4
+
 ; Function Attrs: uwtable
-define linkonce_odr zeroext i8 @_ZN7SoftSPI9SpiMasterIhLNS_8PolarityE0ELNS_8PollEdgeE0ELNS_8BitOrderE0ENS_15SpiClockTogglerEE8transferEjh(%"struct.SoftSPI::SpiMaster"*, i32, i8 zeroext) local_unnamed_addr #8 comdat align 2 {
-  %4 = getelementptr inbounds %"struct.SoftSPI::SpiMaster", %"struct.SoftSPI::SpiMaster"* %0, i64 0, i32 3
-  %5 = load i32, i32* %4, align 4, !tbaa !6
-  %6 = add i32 %5, 1
-  store i32 %6, i32* %4, align 4, !tbaa !6
-  %7 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %8 = and i32 %7, %1
-  %9 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %10 = xor i32 %8, %9
-  store volatile i32 %10, i32* @__R30, align 4, !tbaa !4
-  %11 = getelementptr inbounds %"struct.SoftSPI::SpiMaster", %"struct.SoftSPI::SpiMaster"* %0, i64 0, i32 2, i32 0, i32 0
-  %12 = load i32, i32* %11, align 4
-  %13 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %14 = xor i32 %13, %12
-  store volatile i32 %14, i32* @__R30, align 4, !tbaa !4
-  %15 = bitcast %"struct.SoftSPI::SpiMaster"* %0 to i64*
-  %16 = load i64, i64* %15, align 4
-  %17 = lshr i64 %16, 32
-  %18 = trunc i64 %17 to i32
-  %19 = lshr i8 %2, 7
-  %20 = zext i8 %19 to i32
-  %21 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %22 = xor i32 %20, %21
-  %23 = and i32 %22, %18
-  %24 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %25 = xor i32 %23, %24
-  store volatile i32 %25, i32* @__R30, align 4, !tbaa !4
-  %26 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %27 = xor i32 %26, %12
-  store volatile i32 %27, i32* @__R30, align 4, !tbaa !4
-  %28 = load volatile i32, i32* @__R31, align 4, !tbaa !4
-  %29 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %30 = xor i32 %29, %12
-  store volatile i32 %30, i32* @__R30, align 4, !tbaa !4
-  %31 = lshr i8 %2, 6
-  %32 = and i8 %31, 1
-  %33 = zext i8 %32 to i32
-  %34 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %35 = xor i32 %33, %34
-  %36 = and i32 %35, %18
-  %37 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %38 = xor i32 %36, %37
-  store volatile i32 %38, i32* @__R30, align 4, !tbaa !4
-  %39 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %40 = xor i32 %39, %12
-  store volatile i32 %40, i32* @__R30, align 4, !tbaa !4
-  %41 = load volatile i32, i32* @__R31, align 4, !tbaa !4
-  %42 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %43 = xor i32 %42, %12
-  store volatile i32 %43, i32* @__R30, align 4, !tbaa !4
-  %44 = lshr i8 %2, 5
-  %45 = and i8 %44, 1
-  %46 = zext i8 %45 to i32
-  %47 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %48 = xor i32 %46, %47
-  %49 = and i32 %48, %18
-  %50 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %51 = xor i32 %49, %50
-  store volatile i32 %51, i32* @__R30, align 4, !tbaa !4
-  %52 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %53 = xor i32 %52, %12
-  store volatile i32 %53, i32* @__R30, align 4, !tbaa !4
-  %54 = load volatile i32, i32* @__R31, align 4, !tbaa !4
-  %55 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %56 = xor i32 %55, %12
-  store volatile i32 %56, i32* @__R30, align 4, !tbaa !4
-  %57 = lshr i8 %2, 4
-  %58 = and i8 %57, 1
-  %59 = zext i8 %58 to i32
-  %60 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %61 = xor i32 %59, %60
-  %62 = and i32 %61, %18
-  %63 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %64 = xor i32 %62, %63
-  store volatile i32 %64, i32* @__R30, align 4, !tbaa !4
-  %65 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %66 = xor i32 %65, %12
-  store volatile i32 %66, i32* @__R30, align 4, !tbaa !4
-  %67 = load volatile i32, i32* @__R31, align 4, !tbaa !4
-  %68 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %69 = xor i32 %68, %12
-  store volatile i32 %69, i32* @__R30, align 4, !tbaa !4
-  %70 = lshr i8 %2, 3
-  %71 = and i8 %70, 1
-  %72 = zext i8 %71 to i32
-  %73 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %74 = xor i32 %72, %73
-  %75 = and i32 %74, %18
-  %76 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %77 = xor i32 %75, %76
-  store volatile i32 %77, i32* @__R30, align 4, !tbaa !4
-  %78 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %79 = xor i32 %78, %12
-  store volatile i32 %79, i32* @__R30, align 4, !tbaa !4
-  %80 = load volatile i32, i32* @__R31, align 4, !tbaa !4
-  %81 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %82 = xor i32 %81, %12
-  store volatile i32 %82, i32* @__R30, align 4, !tbaa !4
-  %83 = lshr i8 %2, 2
-  %84 = and i8 %83, 1
-  %85 = zext i8 %84 to i32
-  %86 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %87 = xor i32 %85, %86
-  %88 = and i32 %87, %18
-  %89 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %90 = xor i32 %88, %89
-  store volatile i32 %90, i32* @__R30, align 4, !tbaa !4
-  %91 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %92 = xor i32 %91, %12
-  store volatile i32 %92, i32* @__R30, align 4, !tbaa !4
-  %93 = load volatile i32, i32* @__R31, align 4, !tbaa !4
-  %94 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %95 = xor i32 %94, %12
-  store volatile i32 %95, i32* @__R30, align 4, !tbaa !4
-  %96 = load i32, i32* %11, align 4
-  %97 = load i64, i64* %15, align 4
-  %98 = lshr i64 %97, 32
-  %99 = trunc i64 %98 to i32
-  %100 = lshr i8 %2, 1
-  %101 = and i8 %100, 1
-  %102 = zext i8 %101 to i32
-  %103 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %104 = xor i32 %102, %103
-  %105 = and i32 %104, %99
-  %106 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %107 = xor i32 %105, %106
-  store volatile i32 %107, i32* @__R30, align 4, !tbaa !4
-  %108 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %109 = xor i32 %108, %96
-  store volatile i32 %109, i32* @__R30, align 4, !tbaa !4
-  %110 = load volatile i32, i32* @__R31, align 4, !tbaa !4
-  %111 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %112 = xor i32 %111, %96
-  store volatile i32 %112, i32* @__R30, align 4, !tbaa !4
-  %113 = and i8 %2, 1
-  %114 = zext i8 %113 to i32
-  %115 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %116 = xor i32 %114, %115
-  %117 = and i32 %116, %99
-  %118 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %119 = xor i32 %117, %118
-  store volatile i32 %119, i32* @__R30, align 4, !tbaa !4
-  %120 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %121 = xor i32 %120, %96
-  store volatile i32 %121, i32* @__R30, align 4, !tbaa !4
-  %122 = load volatile i32, i32* @__R31, align 4, !tbaa !4
-  %123 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %124 = xor i32 %123, %96
-  store volatile i32 %124, i32* @__R30, align 4, !tbaa !4
-  %125 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %126 = xor i32 %125, -1
-  %127 = and i32 %126, %1
-  %128 = load volatile i32, i32* @__R30, align 4, !tbaa !4
-  %129 = xor i32 %127, %128
-  store volatile i32 %129, i32* @__R30, align 4, !tbaa !4
-  ret i8 -1
+define linkonce_odr dereferenceable(272) %"class.std::basic_ostream"* @_ZStlsIcSt11char_traitsIcELm32EERSt13basic_ostreamIT_T0_ES6_RKSt6bitsetIXT1_EE(%"class.std::basic_ostream"* dereferenceable(272), %"class.std::bitset"* dereferenceable(8)) local_unnamed_addr #6 comdat personality i8* bitcast (i32 (...)* @__gxx_personality_v0 to i8*) {
+  %3 = alloca %"class.std::__cxx11::basic_string", align 8
+  %4 = alloca %"class.std::locale", align 8
+  %5 = bitcast %"class.std::__cxx11::basic_string"* %3 to i8*
+  call void @llvm.lifetime.start(i64 32, i8* nonnull %5) #2
+  %6 = getelementptr inbounds %"class.std::__cxx11::basic_string", %"class.std::__cxx11::basic_string"* %3, i64 0, i32 2
+  %7 = bitcast %"class.std::__cxx11::basic_string"* %3 to %union.anon**
+  store %union.anon* %6, %union.anon** %7, align 8, !tbaa !17
+  %8 = getelementptr inbounds %"class.std::__cxx11::basic_string", %"class.std::__cxx11::basic_string"* %3, i64 0, i32 1
+  store i64 0, i64* %8, align 8, !tbaa !19
+  %9 = bitcast %union.anon* %6 to i8*
+  store i8 0, i8* %9, align 8, !tbaa !13
+  %10 = bitcast %"class.std::locale"* %4 to i8*
+  call void @llvm.lifetime.start(i64 8, i8* nonnull %10) #2
+  %11 = bitcast %"class.std::basic_ostream"* %0 to i8**
+  %12 = load i8*, i8** %11, align 8, !tbaa !5
+  %13 = getelementptr i8, i8* %12, i64 -24
+  %14 = bitcast i8* %13 to i64*
+  %15 = load i64, i64* %14, align 8
+  %16 = bitcast %"class.std::basic_ostream"* %0 to i8*
+  %17 = getelementptr inbounds i8, i8* %16, i64 %15
+  %18 = getelementptr inbounds i8, i8* %17, i64 208
+  %19 = bitcast i8* %18 to %"class.std::locale"*
+  call void @_ZNSt6localeC1ERKS_(%"class.std::locale"* nonnull %4, %"class.std::locale"* dereferenceable(8) %19) #2
+  %20 = invoke dereferenceable(576) %"class.std::ctype"* @_ZSt9use_facetISt5ctypeIcEERKT_RKSt6locale(%"class.std::locale"* nonnull dereferenceable(8) %4)
+          to label %21 unwind label %83
+
+; <label>:21:                                     ; preds = %2
+  call void @_ZNSt6localeD1Ev(%"class.std::locale"* nonnull %4) #2
+  call void @llvm.lifetime.end(i64 8, i8* nonnull %10) #2
+  %22 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %20, i64 0, i32 8
+  %23 = load i8, i8* %22, align 8, !tbaa !11
+  %24 = icmp eq i8 %23, 0
+  br i1 %24, label %28, label %25
+
+; <label>:25:                                     ; preds = %21
+  %26 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %20, i64 0, i32 9, i64 48
+  %27 = load i8, i8* %26, align 1, !tbaa !13
+  br label %38
+
+; <label>:28:                                     ; preds = %21
+  invoke void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %20)
+          to label %29 unwind label %87
+
+; <label>:29:                                     ; preds = %28
+  %30 = bitcast %"class.std::ctype"* %20 to i8 (%"class.std::ctype"*, i8)***
+  %31 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %30, align 8, !tbaa !5
+  %32 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %31, i64 6
+  %33 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %32, align 8
+  %34 = invoke signext i8 %33(%"class.std::ctype"* nonnull %20, i8 signext 48)
+          to label %35 unwind label %87
+
+; <label>:35:                                     ; preds = %29
+  %36 = load i8, i8* %22, align 8, !tbaa !11
+  %37 = icmp eq i8 %36, 0
+  br i1 %37, label %42, label %38
+
+; <label>:38:                                     ; preds = %25, %35
+  %39 = phi i8 [ %27, %25 ], [ %34, %35 ]
+  %40 = getelementptr inbounds %"class.std::ctype", %"class.std::ctype"* %20, i64 0, i32 9, i64 49
+  %41 = load i8, i8* %40, align 1, !tbaa !13
+  br label %49
+
+; <label>:42:                                     ; preds = %35
+  invoke void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"* nonnull %20)
+          to label %43 unwind label %87
+
+; <label>:43:                                     ; preds = %42
+  %44 = bitcast %"class.std::ctype"* %20 to i8 (%"class.std::ctype"*, i8)***
+  %45 = load i8 (%"class.std::ctype"*, i8)**, i8 (%"class.std::ctype"*, i8)*** %44, align 8, !tbaa !5
+  %46 = getelementptr inbounds i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %45, i64 6
+  %47 = load i8 (%"class.std::ctype"*, i8)*, i8 (%"class.std::ctype"*, i8)** %46, align 8
+  %48 = invoke signext i8 %47(%"class.std::ctype"* nonnull %20, i8 signext 49)
+          to label %49 unwind label %87
+
+; <label>:49:                                     ; preds = %38, %43
+  %50 = phi i8 [ %39, %38 ], [ %34, %43 ]
+  %51 = phi i8 [ %41, %38 ], [ %48, %43 ]
+  %52 = load i64, i64* %8, align 8, !tbaa !19
+  %53 = invoke dereferenceable(32) %"class.std::__cxx11::basic_string"* @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE14_M_replace_auxEmmmc(%"class.std::__cxx11::basic_string"* nonnull %3, i64 0, i64 %52, i64 32, i8 signext %50)
+          to label %54 unwind label %87
+
+; <label>:54:                                     ; preds = %49
+  %55 = getelementptr inbounds %"class.std::bitset", %"class.std::bitset"* %1, i64 0, i32 0, i32 0
+  %56 = getelementptr inbounds %"class.std::__cxx11::basic_string", %"class.std::__cxx11::basic_string"* %3, i64 0, i32 0, i32 0
+  br label %57
+
+; <label>:57:                                     ; preds = %105, %54
+  %58 = phi i64 [ 32, %54 ], [ %69, %105 ]
+  %59 = add nsw i64 %58, -1
+  %60 = load i64, i64* %55, align 8, !tbaa !14
+  %61 = shl i64 1, %59
+  %62 = and i64 %61, %60
+  %63 = icmp eq i64 %62, 0
+  br i1 %63, label %68, label %64
+
+; <label>:64:                                     ; preds = %57
+  %65 = sub nuw nsw i64 32, %58
+  %66 = load i8*, i8** %56, align 8, !tbaa !21
+  %67 = getelementptr inbounds i8, i8* %66, i64 %65
+  store i8 %51, i8* %67, align 1, !tbaa !13
+  br label %68
+
+; <label>:68:                                     ; preds = %64, %57
+  %69 = add nsw i64 %58, -2
+  %70 = load i64, i64* %55, align 8, !tbaa !14
+  %71 = shl i64 1, %69
+  %72 = and i64 %71, %70
+  %73 = icmp eq i64 %72, 0
+  br i1 %73, label %105, label %101
+
+; <label>:74:                                     ; preds = %105
+  %75 = load i8*, i8** %56, align 8, !tbaa !21
+  %76 = load i64, i64* %8, align 8, !tbaa !19
+  %77 = invoke dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* nonnull dereferenceable(272) %0, i8* %75, i64 %76)
+          to label %78 unwind label %87
+
+; <label>:78:                                     ; preds = %74
+  %79 = load i8*, i8** %56, align 8, !tbaa !21
+  %80 = icmp eq i8* %79, %9
+  br i1 %80, label %82, label %81
+
+; <label>:81:                                     ; preds = %78
+  call void @_ZdlPv(i8* %79) #2
+  br label %82
+
+; <label>:82:                                     ; preds = %78, %81
+  call void @llvm.lifetime.end(i64 32, i8* nonnull %5) #2
+  ret %"class.std::basic_ostream"* %77
+
+; <label>:83:                                     ; preds = %2
+  %84 = landingpad { i8*, i32 }
+          cleanup
+  %85 = extractvalue { i8*, i32 } %84, 0
+  %86 = extractvalue { i8*, i32 } %84, 1
+  call void @_ZNSt6localeD1Ev(%"class.std::locale"* nonnull %4) #2
+  call void @llvm.lifetime.end(i64 8, i8* nonnull %10) #2
+  br label %91
+
+; <label>:87:                                     ; preds = %74, %49, %43, %42, %29, %28
+  %88 = landingpad { i8*, i32 }
+          cleanup
+  %89 = extractvalue { i8*, i32 } %88, 0
+  %90 = extractvalue { i8*, i32 } %88, 1
+  br label %91
+
+; <label>:91:                                     ; preds = %87, %83
+  %92 = phi i8* [ %89, %87 ], [ %85, %83 ]
+  %93 = phi i32 [ %90, %87 ], [ %86, %83 ]
+  %94 = getelementptr inbounds %"class.std::__cxx11::basic_string", %"class.std::__cxx11::basic_string"* %3, i64 0, i32 0, i32 0
+  %95 = load i8*, i8** %94, align 8, !tbaa !21
+  %96 = icmp eq i8* %95, %9
+  br i1 %96, label %98, label %97
+
+; <label>:97:                                     ; preds = %91
+  call void @_ZdlPv(i8* %95) #2
+  br label %98
+
+; <label>:98:                                     ; preds = %91, %97
+  call void @llvm.lifetime.end(i64 32, i8* nonnull %5) #2
+  %99 = insertvalue { i8*, i32 } undef, i8* %92, 0
+  %100 = insertvalue { i8*, i32 } %99, i32 %93, 1
+  resume { i8*, i32 } %100
+
+; <label>:101:                                    ; preds = %68
+  %102 = sub i64 33, %58
+  %103 = load i8*, i8** %56, align 8, !tbaa !21
+  %104 = getelementptr inbounds i8, i8* %103, i64 %102
+  store i8 %51, i8* %104, align 1, !tbaa !13
+  br label %105
+
+; <label>:105:                                    ; preds = %101, %68
+  %106 = icmp eq i64 %69, 0
+  br i1 %106, label %74, label %57
 }
+
+; Function Attrs: argmemonly nounwind
+declare void @llvm.lifetime.end(i64, i8* nocapture) #4
+
+declare i32 @__gxx_personality_v0(...)
 
 declare dereferenceable(272) %"class.std::basic_ostream"* @_ZSt16__ostream_insertIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_PKS3_l(%"class.std::basic_ostream"* dereferenceable(272), i8*, i64) local_unnamed_addr #0
 
@@ -441,47 +477,70 @@ declare dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo3putEc(%"class.s
 declare dereferenceable(272) %"class.std::basic_ostream"* @_ZNSo5flushEv(%"class.std::basic_ostream"*) local_unnamed_addr #0
 
 ; Function Attrs: noreturn
-declare void @_ZSt16__throw_bad_castv() local_unnamed_addr #9
+declare void @_ZSt16__throw_bad_castv() local_unnamed_addr #7
 
 declare void @_ZNKSt5ctypeIcE13_M_widen_initEv(%"class.std::ctype"*) local_unnamed_addr #0
 
+declare dereferenceable(576) %"class.std::ctype"* @_ZSt9use_facetISt5ctypeIcEERKT_RKSt6locale(%"class.std::locale"* dereferenceable(8)) local_unnamed_addr #0
+
+; Function Attrs: nounwind
+declare void @_ZNSt6localeD1Ev(%"class.std::locale"*) unnamed_addr #1
+
+; Function Attrs: nounwind
+declare void @_ZNSt6localeC1ERKS_(%"class.std::locale"*, %"class.std::locale"* dereferenceable(8)) unnamed_addr #1
+
+declare dereferenceable(32) %"class.std::__cxx11::basic_string"* @_ZNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE14_M_replace_auxEmmmc(%"class.std::__cxx11::basic_string"*, i64, i64, i64, i8 signext) local_unnamed_addr #0
+
+; Function Attrs: nobuiltin nounwind
+declare void @_ZdlPv(i8*) local_unnamed_addr #8
+
 ; Function Attrs: uwtable
-define internal void @_GLOBAL__sub_I_softspi_setup_example.cpp() #8 section ".text.startup" {
+define internal void @_GLOBAL__sub_I_softspi_setup_example.cpp() #6 section ".text.startup" {
   tail call void @_ZNSt8ios_base4InitC1Ev(%"class.std::ios_base::Init"* nonnull @_ZStL8__ioinit)
   %1 = tail call i32 @__cxa_atexit(void (i8*)* bitcast (void (%"class.std::ios_base::Init"*)* @_ZNSt8ios_base4InitD1Ev to void (i8*)*), i8* getelementptr inbounds (%"class.std::ios_base::Init", %"class.std::ios_base::Init"* @_ZStL8__ioinit, i64 0, i32 0), i8* nonnull @__dso_handle) #2
+  store <4 x i32> <i32 10, i32 0, i32 5, i32 0>, <4 x i32>* bitcast (%"struct.SoftSPI::ClockTimings"* @_ZL7timings to <4 x i32>*), align 16, !tbaa !1, !alias.scope !22
+  store i32 5, i32* getelementptr inbounds (%"struct.SoftSPI::ClockTimings", %"struct.SoftSPI::ClockTimings"* @_ZL7timings, i64 0, i32 4), align 16, !tbaa !25, !alias.scope !22
+  %2 = tail call {}* @llvm.invariant.start.p0i8(i64 20, i8* bitcast (%"struct.SoftSPI::ClockTimings"* @_ZL7timings to i8*))
   ret void
 }
 
 attributes #0 = { "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #1 = { nounwind "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #2 = { nounwind }
-attributes #3 = { norecurse nounwind readnone uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #3 = { norecurse nounwind uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
 attributes #4 = { argmemonly nounwind }
-attributes #5 = { norecurse nounwind readonly uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #6 = { norecurse nounwind uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #7 = { norecurse uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #8 = { uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #9 = { noreturn "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
-attributes #10 = { noreturn }
+attributes #5 = { norecurse uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #6 = { uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #7 = { noreturn "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #8 = { nobuiltin nounwind "correctly-rounded-divide-sqrt-fp-math"="false" "disable-tail-calls"="false" "less-precise-fpmad"="false" "no-frame-pointer-elim"="false" "no-infs-fp-math"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+fxsr,+mmx,+sse,+sse2,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+attributes #9 = { noreturn }
 
 !llvm.ident = !{!0}
 
 !0 = !{!"clang version 4.0.1-6 (tags/RELEASE_401/final)"}
 !1 = !{!2, !2, i64 0}
-!2 = !{!"omnipotent char", !3, i64 0}
-!3 = !{!"Simple C++ TBAA"}
-!4 = !{!5, !5, i64 0}
-!5 = !{!"int", !2, i64 0}
-!6 = !{!7, !5, i64 56}
-!7 = !{!"_ZTSN7SoftSPI9SpiMasterIhLNS_8PolarityE0ELNS_8PollEdgeE0ELNS_8BitOrderE0ENS_15SpiClockTogglerEEE", !8, i64 0, !9, i64 12, !10, i64 32, !5, i64 56}
-!8 = !{!"_ZTSN7SoftSPI6IOPinsE", !5, i64 0, !5, i64 4, !5, i64 8}
-!9 = !{!"_ZTSN7SoftSPI12ClockTimingsE", !5, i64 0, !5, i64 4, !5, i64 8, !5, i64 12, !5, i64 16}
-!10 = !{!"_ZTSN7SoftSPI15SpiClockTogglerILNS_8PolarityE0EEE"}
-!11 = !{!12, !12, i64 0}
-!12 = !{!"vtable pointer", !3, i64 0}
-!13 = !{!14, !15, i64 240}
-!14 = !{!"_ZTSSt9basic_iosIcSt11char_traitsIcEE", !15, i64 216, !2, i64 224, !16, i64 225, !15, i64 232, !15, i64 240, !15, i64 248, !15, i64 256}
-!15 = !{!"any pointer", !2, i64 0}
-!16 = !{!"bool", !2, i64 0}
-!17 = !{!18, !2, i64 56}
-!18 = !{!"_ZTSSt5ctypeIcE", !15, i64 16, !16, i64 24, !15, i64 32, !15, i64 40, !15, i64 48, !2, i64 56, !2, i64 57, !2, i64 313, !2, i64 569}
+!2 = !{!"int", !3, i64 0}
+!3 = !{!"omnipotent char", !4, i64 0}
+!4 = !{!"Simple C++ TBAA"}
+!5 = !{!6, !6, i64 0}
+!6 = !{!"vtable pointer", !4, i64 0}
+!7 = !{!8, !9, i64 240}
+!8 = !{!"_ZTSSt9basic_iosIcSt11char_traitsIcEE", !9, i64 216, !3, i64 224, !10, i64 225, !9, i64 232, !9, i64 240, !9, i64 248, !9, i64 256}
+!9 = !{!"any pointer", !3, i64 0}
+!10 = !{!"bool", !3, i64 0}
+!11 = !{!12, !3, i64 56}
+!12 = !{!"_ZTSSt5ctypeIcE", !9, i64 16, !10, i64 24, !9, i64 32, !9, i64 40, !9, i64 48, !3, i64 56, !3, i64 57, !3, i64 313, !3, i64 569}
+!13 = !{!3, !3, i64 0}
+!14 = !{!15, !16, i64 0}
+!15 = !{!"_ZTSSt12_Base_bitsetILm1EE", !16, i64 0}
+!16 = !{!"long", !3, i64 0}
+!17 = !{!18, !9, i64 0}
+!18 = !{!"_ZTSNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEE12_Alloc_hiderE", !9, i64 0}
+!19 = !{!20, !16, i64 8}
+!20 = !{!"_ZTSNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE", !18, i64 0, !16, i64 8, !3, i64 16}
+!21 = !{!20, !9, i64 0}
+!22 = !{!23}
+!23 = distinct !{!23, !24, !"_ZN7SoftSPI12ClockTimings29with_sck_cycle_and_pre_delaysEjjj: argument 0"}
+!24 = distinct !{!24, !"_ZN7SoftSPI12ClockTimings29with_sck_cycle_and_pre_delaysEjjj"}
+!25 = !{!26, !2, i64 16}
+!26 = !{!"_ZTSN7SoftSPI12ClockTimingsE", !2, i64 0, !2, i64 4, !2, i64 8, !2, i64 12, !2, i64 16}

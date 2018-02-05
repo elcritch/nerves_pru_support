@@ -74,7 +74,8 @@ template <typename DataWord,
           Polarity CPOL,
           PollEdge CPHA,
           BitOrder BITEND,
-          template <Polarity> class ClockType>
+          template <Polarity> class ClockType,
+          const ClockTimings& timings>
 struct SpiMaster {
 
   typedef ClockType<CPOL> Clock;
@@ -82,14 +83,14 @@ struct SpiMaster {
   typedef SpiXfer<CPHA> Xfer;
 
   const IOPins pins;
-  const ClockTimings timings;
+  // const ClockTimings timings;
   Clock clock;
   Xfer xfer;
   Packer packer;
 
   uint64_t __xfers;
 
-  SpiMaster(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings), __xfers(0) {}
+  SpiMaster(IOPins _p) : pins(_p), clock(pins.sck, timings), __xfers(0) {}
 
   inline void select(Pin cs) { digitalWrite(cs, LOW); }
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
