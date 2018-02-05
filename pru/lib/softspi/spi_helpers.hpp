@@ -12,31 +12,18 @@
 namespace SoftSPI {
 
 
-template<uint32_t S0, uint32_t P0, uint32_t P1, uint32_t C0, uint32_t C1>
+template<uint32_t sck_cycle,
+         uint32_t prop_pre,
+         uint32_t prop_post,
+         uint32_t capt_pre,
+         uint32_t capt_post>
 struct ClockTimings {
-  // more precise than micro second delay,
-  // 1/4 of SPI bus frequency , depends on MCU master clock,
-  // const uint32_t sck_cycle;
-  // propogation pre
-  // const uint32_t prop_pre;
-  // propogation post
-  // const uint32_t prop_post;
-  // capture pre (SCK edge -> capture) usually smaller delay
-  // const uint32_t capt_pre;
-  // capture post ( capture -> SCK edge)  usually bigger delay
-  // const uint32_t capt_post;
 
-  // ClockTimings()
-    // : sck_cycle(0), prop_pre(0), prop_post(0), capt_pre(0), capt_post(0) {}
-
-  // ClockTimings(uint32_t s0, uint32_t p0, uint32_t p1, uint32_t c0, uint32_t c1)
-    // : sck_cycle(s0), prop_pre(p0), prop_post(p1), capt_pre(c0), capt_post(c1) {}
-
-  static inline void delayCycles() { delayCycles(S0); }
-  static inline void delayCyclesP0() { delayCycles(P0); }
-  static inline void delayCyclesP1() { delayCycles(P1); }
-  static inline void delayCyclesC0() { delayCycles(C0); }
-  static inline void delayCyclesC1() { delayCycles(C1); }
+  static inline void delayCycles() { delayCycles(sck_cycle); }
+  static inline void delayCyclesP0() { delayCycles(prop_pre); }
+  static inline void delayCyclesP1() { delayCycles(prop_post); }
+  static inline void delayCyclesC0() { delayCycles(capt_pre); }
+  static inline void delayCyclesC1() { delayCycles(capt_post); }
 
   static void delayCycles(uint32_t cycles) {
     uint32_t i;
@@ -44,14 +31,6 @@ struct ClockTimings {
       NOOP;
     }
   }
-
-  // static inline ClockTimings with_sck_cycle_and_pre_delays(uint32_t sck_cycle, uint32_t prop_pre, uint32_t capt_pre) {
-    // return ClockTimings(sck_cycle,
-                        // prop_pre,
-                        // sck_cycle/2-prop_pre,
-                        // prop_pre,
-                        // sck_cycle/2-capt_pre);
-  // }
 };
 
 // ========================================================================== //
