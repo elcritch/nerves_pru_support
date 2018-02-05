@@ -44,9 +44,11 @@ void digitalToggle(uint32_t gpio_bitmask) {
 }
 
 
-const ClockTimings timings = ClockTimings::with_sck_cycle_and_pre_delays(10, 0, 0);
+// const ClockTimings timings = ClockTimings::with_sck_cycle_and_pre_delays(10, 0, 0);
 
 #include <bitset>
+
+typedef ClockTimings<10,5,0,5,0> Timings;
 
 int main() {
 
@@ -54,7 +56,7 @@ int main() {
   uint8_t out;
 
   // Mode 0
-  SpiMaster<uint8_t, Polarity::Std, PollEdge::Rising, MsbFirst, SpiClockToggler, timings> spi0(pins);
+  SpiMaster<uint8_t, Polarity::Std, PollEdge::Rising, MsbFirst, SpiClockToggler, Timings> spi0(pins);
 
   std::cout << "\nRunning... mode 0" << std::endl;
 

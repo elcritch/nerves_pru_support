@@ -75,7 +75,7 @@ template <typename DataWord,
           PollEdge CPHA,
           BitOrder BITEND,
           template <Polarity> class ClockType,
-          const ClockTimings& timings>
+          typename Timings>
 struct SpiMaster {
 
   typedef ClockType<CPOL> Clock;
@@ -90,7 +90,7 @@ struct SpiMaster {
 
   uint64_t __xfers;
 
-  SpiMaster(IOPins _p) : pins(_p), clock(pins.sck, timings), __xfers(0) {}
+  SpiMaster(IOPins _p) : pins(_p), clock(pins.sck), __xfers(0) {}
 
   inline void select(Pin cs) { digitalWrite(cs, LOW); }
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
@@ -106,17 +106,17 @@ struct SpiMaster {
     clock.tock();
 
     // Here, delay is added, to make CPHA=1 and CPHA=0 both work!
-    clock.delayCycles();
+    Timings::delayCycles();
 
     // Check that your compiler unroll's this properly!
 
     uint8_t idx;
     for (idx = 0; idx < word_size; idx++) {
       DataWord bit = packer.mask(b, idx, word_size);
-      bits[idx] = xfer.xfer_cycle( clock, pins, bit);
+      bits[idx] = xfer.template xfer_cycle<Clock, Timings>( clock, pins, bit);
     }
 
-    clock.delayCycles(); // checking timing characteristics, it is no
+    Timings::delayCycles(); // checking timing characteristics, it is no
 
     // needed by AD7730, from CS to rising edge
     unselect(cs);
