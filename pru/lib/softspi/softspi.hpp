@@ -91,10 +91,11 @@ struct SpiMaster {
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
 
-  DataWord reply = 0;
+  DataWord reply;
   DataWord bits[sizeof(DataWord)];
 
   uint8_t transfer(Pin cs, DataWord b) {
+    reply = 0;
 
     // Start xfer cycle
     select(cs);
