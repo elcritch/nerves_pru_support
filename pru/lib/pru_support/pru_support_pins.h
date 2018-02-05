@@ -19,6 +19,8 @@
  * referenced anywhere in software, the user would use the number 88, not 24!
  */
 
+typedef uint32_t Pin;
+
 /* #ifdef BB_BLACK | BB_GREEN */
 
 /* P8 */
