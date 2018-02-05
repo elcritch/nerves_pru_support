@@ -5,7 +5,6 @@
 #include <string>
 
 volatile uint32_t __R30;
-volatile uint32_t __R31;
 
 // #define DEBUG_STMT
 // void debug(std::string msg);
@@ -35,7 +34,7 @@ void digitalWrite(uint32_t gpio_bitmask, uint32_t state) {
 bool digitalRead(uint32_t gpio_bitmask) {
   // 1 cycle read for R31, 1 inst for &, 1 inst for gt
   // est. 3 cycles
-  return (__R31 & gpio_bitmask) > 0;
+  return (__R30 & gpio_bitmask) > 0;
 }
 
 void digitalToggle(uint32_t gpio_bitmask) {
@@ -63,7 +62,7 @@ int main() {
 
   std::cout << "\nDone: cout: " ;
 
-  std::cout<<std::bitset<8>(out)<<std::endl;
+  std::cout<<std::bitset<32>(__R30)<<std::endl;
 
   return 0;
 }
