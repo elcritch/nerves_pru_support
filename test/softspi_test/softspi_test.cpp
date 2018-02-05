@@ -27,7 +27,7 @@ struct PinState {
     mosi = false;
     sck = false;
     other_pin = 0;
-    other_state = false;
+    other_state = true;
   }
 
   void print() {
@@ -92,6 +92,7 @@ struct SimpleCycleTiming {
 void delay_test_cycles();
 void digitalWrite(uint32_t gpio_bitmask, bool state);
 bool digitalRead(uint32_t gpio_bitmask);
+void digitalToggle(uint32_t gpio_bitmask);
 
 #define NOOP delay_test_cycles()
 #define PRU_SUPPORT_OVERRIDE_GPIO_FUNCS
@@ -107,6 +108,10 @@ void delay_test_cycles() {
 
 void digitalWrite(uint32_t gpio_bitmask, bool state) {
   cycle_data.set_pin(gpio_bitmask, state);
+  // cycle_data.incr();
+}
+void digitalToggle(uint32_t gpio_bitmask) {
+  cycle_data.set_pin(gpio_bitmask, !cycle_data.get_pin(gpio_bitmask));
   // cycle_data.incr();
 }
 bool digitalRead(uint32_t gpio_bitmask) {

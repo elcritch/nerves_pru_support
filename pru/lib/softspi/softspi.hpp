@@ -65,10 +65,11 @@ struct IOPins {
 template <typename DataWord,
           Polarity CPOL = Std,
           PollEdge CPHA = Rising,
-          BitOrder BITEND = MsbFirst>
+          BitOrder BITEND = MsbFirst,
+          class Clock = SpiClockToggler<CPOL>>
 struct SoftSPI {
 
-  typedef SpiClock<CPOL> Clock;
+  // typedef ClockClass Clock;
   typedef SpiPack<BITEND> Packer;
   typedef SpiXfer<CPHA> Xfer;
 
@@ -95,8 +96,10 @@ struct SoftSPI {
     clock.delayCycles();
 
     // Check that your compiler unroll's this properly!
+    const uint8_t word_size = 8*sizeof(DataWord);
+
     uint8_t idx;
-    for (idx = 0; idx < sizeof(DataWord)*8; idx++) {
+    for (idx = 0; idx < word_size; idx++) {
       bits[idx] = Xfer::xfer_cycle( clock, pins, Packer::mask(b, idx) );
     }
 

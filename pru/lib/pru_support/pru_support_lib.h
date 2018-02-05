@@ -102,6 +102,13 @@ inline bool digitalRead(uint32_t gpio_bitmask) {
   // est. 3 cycles
   return (__R31 & gpio_bitmask) > 0;
 }
+
+inline void digitalToggle(uint32_t gpio_bitmask) {
+  // 1 cycle read for R30, 1 inst for ^, 
+  // est. to be 2 cycles (~10 ns)
+  __R30 ^= gpio_bitmask;
+}
+
 #endif
 
 #ifdef __cplusplus

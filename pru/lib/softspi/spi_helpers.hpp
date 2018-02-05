@@ -48,8 +48,16 @@ struct SpiClock {
   const ClockTimings timings;
 
   SpiClock(Pin _s, ClockTimings _t) : sck(_s), timings(_t) {}
-  void tick();
-  void tock();
+
+  inline void start();
+  inline void stop();
+
+  inline void tick() {
+    start();
+  }
+  inline void tock() {
+    stop();
+  }
 
   inline void delayCycles(uint32_t cycles) {
     uint32_t i;
@@ -59,33 +67,47 @@ struct SpiClock {
     }
   }
 
-  void delayCycles() { delayCycles(timings.sck_cycle); }
-  void delayCyclesP0() { delayCycles(timings.prop_pre); }
-  void delayCyclesP1() { delayCycles(timings.prop_post); }
-  void delayCyclesC0() { delayCycles(timings.capt_pre); }
-  void delayCyclesC1() { delayCycles(timings.capt_post); }
+  inline void delayCycles() { delayCycles(timings.sck_cycle); }
+  inline void delayCyclesP0() { delayCycles(timings.prop_pre); }
+  inline void delayCyclesP1() { delayCycles(timings.prop_post); }
+  inline void delayCyclesC0() { delayCycles(timings.capt_pre); }
+  inline void delayCyclesC1() { delayCycles(timings.capt_post); }
+};
+
+template <Polarity CPOL>
+struct SpiClockToggler : SpiClock<CPOL> {
+
+  SpiClockToggler(Pin _s, ClockTimings _t) : SpiClock<CPOL>(_s,_t) {}
+
+  inline void tick() {
+    digitalToggle(SpiClock<CPOL>::sck);
+  }
+  inline void tock() {
+    digitalToggle(SpiClock<CPOL>::sck);
+  }
+
 };
 
 //  clock inverted
 template<>
-void SpiClock<Inv>::tick() {
+inline void SpiClock<Inv>::start() {
   debug("tick");
   digitalWrite(sck, LOW);
 }
 template<>
-void SpiClock<Inv>::tock() {
+inline void SpiClock<Inv>::stop() {
   debug("tock");
   digitalWrite(sck, HIGH);
 }
 
 //  clock standard
 template<>
-void SpiClock<Std>::tick() {
+inline void SpiClock<Std>::start() {
   debug("tick");
   digitalWrite(sck, HIGH);
 }
 template<>
-void SpiClock<Std>::tock() {
+inline void SpiClock<Std>::stop() {
   debug("tock");
   digitalWrite(sck, LOW);
 }
@@ -96,8 +118,8 @@ void SpiClock<Std>::tock() {
 // ========================================================================== //
 template <BitOrder BITEND>
 struct SpiPack {
-  static uint8_t mask(uint8_t byte, uint8_t idx);
-  static uint8_t pack(uint8_t bits[]);
+  inline static uint8_t mask(uint8_t byte, uint8_t idx);
+  inline static uint8_t pack(uint8_t bits[]);
 };
 
 template<>
