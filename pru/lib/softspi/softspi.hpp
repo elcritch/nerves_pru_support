@@ -111,7 +111,7 @@ struct SpiMaster {
 
     uint8_t idx;
     for (idx = 0; idx < word_size; idx++) {
-      bits[idx] = xfer.xfer_cycle( clock, pins, packer.mask(b, idx) );
+      bits[idx] = xfer.xfer_cycle( clock, pins, packer.mask(b, idx, word_size) );
     }
 
     clock.delayCycles(); // checking timing characteristics, it is no

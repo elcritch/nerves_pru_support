@@ -94,24 +94,20 @@ struct SpiClockToggler : SpiClock<CPOL> {
 //  clock inverted
 template<>
 inline void SpiClock<Inv>::start() {
-  debug("tick");
   digitalWrite(sck, LOW);
 }
 template<>
 inline void SpiClock<Inv>::stop() {
-  debug("tock");
   digitalWrite(sck, HIGH);
 }
 
 //  clock standard
 template<>
 inline void SpiClock<Std>::start() {
-  debug("tick");
   digitalWrite(sck, HIGH);
 }
 template<>
 inline void SpiClock<Std>::stop() {
-  debug("tock");
   digitalWrite(sck, LOW);
 }
 
@@ -121,28 +117,23 @@ inline void SpiClock<Std>::stop() {
 // ========================================================================== //
 template <BitOrder BITEND>
 struct SpiPack {
-  inline uint8_t mask(uint8_t byte, uint8_t idx);
+  inline uint8_t mask(uint8_t byte, uint8_t idx, const uint32_t word_size);
   inline uint8_t pack(uint8_t bits[]);
 };
 
 template<>
-uint8_t SpiPack<MsbFirst>::mask(uint8_t byte, uint8_t idx) {
-  debug("");
-  uint8_t mask[] = {0x80, 0x40, 0x20, 0x10, 0x8, 0x4, 0x2, 0x1};
-  return mask[idx] & byte;
+uint8_t SpiPack<MsbFirst>::mask(uint8_t byte, uint8_t idx, const uint32_t word_size) {
+  return (16*word_size >> idx) & byte;
 }
 
 template<>
-uint8_t SpiPack<LsbFirst>::mask(uint8_t byte, uint8_t idx) {
-  debug("");
-  uint8_t mask[] = {0x1, 0x2, 0x4, 0x8, 0x10, 0x20, 0x40, 0x80};
-  return mask[idx] & byte;
+uint8_t SpiPack<LsbFirst>::mask(uint8_t byte, uint8_t idx, const uint32_t word_size) {
+  return (1 << idx) & byte;
 }
 
 template<>
 uint8_t SpiPack<MsbFirst>::pack(uint8_t bits[])
 {
-  debug("");
   return (bits[0] << 7 | bits[1] << 6 | bits[2] << 5 | bits[3] << 4 | bits[4] << 3 | \
           bits[5] << 2 | bits[6] << 1 | bits[7]);
 }
