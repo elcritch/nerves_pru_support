@@ -4,25 +4,23 @@ PROJ_NAME=$(CURRENT_DIR)
 #-----------------------------------
 INCLUDE=-I../../pru/include -I../../pru/lib/softspi
 #-----------------------------------
-GEN_DIR=gen
 LIB_DIR=../../pru/lib/softspi/
 
 CFLAGS= -O3 -g  -std=c++11  -DPRU_SUPPORT_OVERRIDE_R30 -DPRU_SUPPORT_OVERRIDE_R31
 
-TARGET=$(GEN_DIR)/$(PROJ_NAME)
 SOURCES=$(wildcard *.cpp)
 #Using .object instead of .obj in order to not conflict with the CCS build process
-OBJECTS=$(patsubst %,$(GEN_DIR)/%,$(SOURCES:.cpp=.o))
+OBJECTS=$(SOURCES:.cpp=.o)
+TARGETS=$(OBJECTS:.o=_test)
 
 test: all
 
-all: printStart $(TARGET) printEnd
+all: printStart $(TARGETS) printEnd
 
 printStart:
 	@echo ''
 	@echo '************************************************************'
 	@echo 'Building project: $(PROJ_NAME)'
-	@mkdir -p $(GEN_DIR)
 
 printEnd:
 	@echo ''
@@ -31,21 +29,19 @@ printEnd:
 	@echo ''
 
 # Invokes the archiver to make the .lib file
-$(TARGET): $(OBJECTS)
+%_test: %.o
 	@echo ''
 	@echo 'Building target: $@'
-	@echo 'Invoking: PRU Archiver'
-	$(CXX) $(CFLAGS) -flto -o $(TARGET) $(OBJECTS)
+	$(CXX) $(CFLAGS) -o $@ $<
 	@echo 'Finished building target: $@'
 	@echo ''
-	@echo 'Output files can be found in the "$(GEN_DIR)" directory'
 
 # Invokes the compiler on all c files in the directory to create the object files
-$(GEN_DIR)/%.o: %.cpp
+%.o: %.cpp
 	@echo ''
 	@echo 'Building file: $<'
 	@echo 'Invoking: CC Compiler'
-	$(CXX) $(INCLUDE) $(CFLAGS) -c -flto -o $@ $<
+	$(CXX) $(INCLUDE) $(CFLAGS) -c -o $@ $<
 
 .PHONY: all clean
 
@@ -56,7 +52,7 @@ clean:
 	@echo 'Cleaning project: $(PROJ_NAME)'
 	@echo ''
 	@echo 'Removing files in the "$(GEN_DIR)" directory'
-	@rm -rf $(GEN_DIR)
+	@rm -rf $(OBJECTS) $(TARGETS)
 	@echo ''
 	@echo 'Finished cleaning project: $(PROJ_NAME)'
 	@echo '************************************************************'
