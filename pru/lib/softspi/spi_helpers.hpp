@@ -4,7 +4,6 @@
 #define _SOFTWARE_SPI_HELPERS_H
 
 #include <stdint.h>
-#include <iostream>
 
 #ifndef DEBUG_STMT
 #define debug(msg)
