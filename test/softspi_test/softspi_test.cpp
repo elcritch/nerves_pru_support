@@ -191,7 +191,7 @@ int main() {
   // };
 
   // Mode 0
-  SpiMaster<uint8_t, Polarity::Std, PollEdge::Rising, MsbFirst> spi0(pins, timings);
+  SpiMaster<uint8_t, Polarity::Std, PollEdge::Rising, MsbFirst, SpiClockToggler> spi0(pins, timings);
 
   cycle_data = SimpleCycleTiming<IOPins, Pin>();
   cycle_data.pins = pins;
@@ -202,7 +202,7 @@ int main() {
   printCycleData(out);
 
   // Mode 1
-  SpiMaster<uint8_t, Polarity::Std, PollEdge::Falling, MsbFirst> spi1(pins, timings);
+  SpiMaster<uint8_t, Polarity::Std, PollEdge::Falling, MsbFirst, SpiClockToggler> spi1(pins, timings);
 
   cycle_data = SimpleCycleTiming<IOPins, Pin>();
   cycle_data.pins = pins;
@@ -213,7 +213,7 @@ int main() {
   printCycleData(out);
 
   // Mode 2
-  SpiMaster<uint8_t, Polarity::Inv, PollEdge::Rising, MsbFirst> spi2(pins, timings);
+  SpiMaster<uint8_t, Polarity::Inv, PollEdge::Rising, MsbFirst, SpiClockToggler> spi2(pins, timings);
 
   cycle_data = SimpleCycleTiming<IOPins, Pin>();
   cycle_data.pins = pins;
@@ -224,7 +224,7 @@ int main() {
   printCycleData(out);
 
   // Mode 3
-  SpiMaster<uint8_t, Polarity::Inv, PollEdge::Falling, MsbFirst> spi3(pins, timings);
+  SpiMaster<uint8_t, Polarity::Inv, PollEdge::Falling, MsbFirst, SpiClockToggler> spi3(pins, timings);
 
   cycle_data = SimpleCycleTiming<IOPins, Pin>();
   cycle_data.pins = pins;
@@ -235,7 +235,7 @@ int main() {
   printCycleData(out);
 
   // Mode 0 - MSB
-  SpiMaster<uint8_t, Polarity::Std, PollEdge::Rising, MsbFirst> spi0msb(pins, timings);
+  SpiMaster<uint8_t, Polarity::Std, PollEdge::Rising, MsbFirst, SpiClockToggler> spi0msb(pins, timings);
 
   cycle_data = SimpleCycleTiming<IOPins, Pin>();
   cycle_data.pins = pins;
@@ -246,7 +246,7 @@ int main() {
   printCycleData(out);
 
   // Mode 0 - LSB
-  SpiMaster<uint8_t, Polarity::Std, PollEdge::Rising, LsbFirst> spi0lsb(pins, timings);
+  SpiMaster<uint8_t, Polarity::Std, PollEdge::Rising, LsbFirst, SpiClockToggler> spi0lsb(pins, timings);
 
   cycle_data = SimpleCycleTiming<IOPins, Pin>();
   cycle_data.pins = pins;

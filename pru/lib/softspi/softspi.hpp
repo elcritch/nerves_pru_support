@@ -71,13 +71,13 @@ namespace SoftSPI {
 
 
 template <typename DataWord,
-          Polarity CPOL = Std,
-          PollEdge CPHA = Rising,
-          BitOrder BITEND = MsbFirst,
-          class Clock = SpiClockToggler<CPOL>>
+          Polarity CPOL,
+          PollEdge CPHA,
+          BitOrder BITEND,
+          template <Polarity> class ClockType>
 struct SpiMaster {
 
-  // typedef ClockClass Clock;
+  typedef ClockType<CPOL> Clock;
   typedef SpiPack<BITEND> Packer;
   typedef SpiXfer<CPHA> Xfer;
 
