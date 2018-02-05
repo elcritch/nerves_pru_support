@@ -85,17 +85,18 @@ struct SpiMaster {
   const ClockTimings timings;
   Clock clock;
 
-  SpiMaster(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings) {}
+  uint32_t cycles;
+
+  SpiMaster(IOPins _p, ClockTimings _t) : pins(_p), timings(_t), clock(pins.sck, timings), cycles(0) {}
 
   inline void select(Pin cs) { digitalWrite(cs, LOW); }
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
 
-  DataWord reply;
-  DataWord bits[sizeof(DataWord)];
-
   uint8_t transfer(Pin cs, DataWord b) {
-    reply = 0;
+    DataWord reply;
+    DataWord bits[sizeof(DataWord)];
+    cycles++;
 
     // Start xfer cycle
     select(cs);

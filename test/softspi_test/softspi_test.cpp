@@ -4,11 +4,11 @@
 #include <iostream>
 #include <string>
 
-uint32_t __R30;
-uint32_t __R31;
+volatile uint32_t __R30;
+volatile uint32_t __R31;
 
-#define DEBUG_STMT
-void debug(std::string msg);
+// #define DEBUG_STMT
+// void debug(std::string msg);
 
 #define MAX_CYCLES 4096
 
@@ -107,7 +107,6 @@ void delay_test_cycles() {
   cycle_data.incr();
 }
 
-
 void digitalWrite(uint32_t gpio_bitmask, bool state) {
   cycle_data.set_pin(gpio_bitmask, state);
   // cycle_data.incr();
@@ -122,10 +121,10 @@ bool digitalRead(uint32_t gpio_bitmask) {
   return res;
 }
 
-void debug(std::string msg) {
+// void debug(std::string msg) {
   // std::cout << "cycle: " << cycle_data.cycle << std::endl;
   // std::cout << msg << std::endl;
-}
+// }
 
 void printCycleDataFull() {
 
