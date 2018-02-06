@@ -148,13 +148,13 @@ template <>
 template <class Clock, class Timings>
 uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, bool bit)
 {
-  bool read;
+  bool read = 0;
 
   clock.tick();
 
   Timings::delayCyclesP0();
 
-  digitalWrite(pins.mosi, bit);
+  digitalWrite(pins.mosi, bit ? HIGH : LOW);
 
   // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
   Timings::delayCyclesP1(); //  propagation
@@ -175,10 +175,10 @@ template <>
 template <class Clock, class Timings>
 uint8_t SpiXfer<Rising>::xfer_cycle( Clock clock, IOPins pins, bool bit)
 {
-  bool read;
+  bool read = 0;
 
   // changing MOSI big while SCK low, propogation
-  digitalWrite(pins.mosi, bit);
+  digitalWrite(pins.mosi, bit ? HIGH : LOW);
 
   // there is a requirement of LOW and HIGH have identical interval!
   Timings::delayCyclesP1();
