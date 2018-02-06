@@ -68,7 +68,7 @@ defmodule Pru.Port do
   # gen_server callbacks
   def init([pin, msgopts]) do
     Logger.info("Pru.Port init - pin: #{inspect(pin)} ")
-    executable = :code.priv_dir(:pru) ++ '/pru_msg'
+    executable = :code.priv_dir(:nerves_pru_support) ++ '/pru_msg'
 
     port =
       Port.open({:spawn_executable, executable}, [
