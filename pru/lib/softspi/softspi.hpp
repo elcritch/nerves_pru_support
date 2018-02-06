@@ -53,14 +53,6 @@ struct IOPins {
 
 #include "spi_helpers.hpp"
 
-#ifndef LOW
-#define LOW false
-#endif
-#ifndef HIGH
-#define HIGH true
-#endif
-
-
 #ifndef NOOP
 // __nop();
 // __asm__("nop\n\t");
