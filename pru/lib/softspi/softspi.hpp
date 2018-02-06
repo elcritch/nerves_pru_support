@@ -44,9 +44,9 @@ enum PollEdge {
 typedef uint32_t Pin;
 
 struct IOPins {
-  Pin miso;
-  Pin mosi;
-  Pin sck;
+  const Pin miso;
+  const Pin mosi;
+  const Pin sck;
 };
 
 }
@@ -89,17 +89,18 @@ struct SpiMaster {
   inline void select(Pin cs) { digitalWrite(cs, LOW); }
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
-
   uint8_t transfer(Pin cs, DataWord b) {
     DataWord bits[WordSize];
     this->__xfers++;
 
+    digitalWrite(pins.mosi, LOW);
+
     // Start xfer cycle
-    select(cs);
     clock.tock();
 
     // Here, delay is added, to make CPHA=1 and CPHA=0 both work!
     Timings::delayCycles();
+    select(cs);
 
     // Check that your compiler unroll's this properly!
 
@@ -109,10 +110,11 @@ struct SpiMaster {
       bits[idx] = xfer.template xfer_cycle<Clock, Timings>( clock, pins, bit);
     }
 
+    unselect(cs);
     Timings::delayCycles(); // checking timing characteristics, it is no
 
+    digitalWrite(pins.mosi, HIGH);
     // needed by AD7730, from CS to rising edge
-    unselect(cs);
 
     return packer.template pack<DataWord>(bits,WordSize);
   }
