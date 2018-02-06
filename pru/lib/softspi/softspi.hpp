@@ -53,11 +53,13 @@ struct IOPins {
 
 #include "spi_helpers.hpp"
 
-#ifndef NOOP
-// __nop();
-// __asm__("nop\n\t");
-#define NOOP __delay_cycles(1)
-#endif
+// #ifndef NOOP
+// // __nop();
+// // __asm__("nop\n\t");
+// #define NOOP __delay_cycles(1)
+// #endif
+
+#define WordSize ( 8*sizeof(DataWord) )
 
 namespace SoftSPI {
 
@@ -87,10 +89,9 @@ struct SpiMaster {
   inline void select(Pin cs) { digitalWrite(cs, LOW); }
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
-  const uint8_t word_size = 8*sizeof(DataWord);
 
   uint8_t transfer(Pin cs, DataWord b) {
-    DataWord bits[word_size];
+    DataWord bits[WordSize];
     this->__xfers++;
 
     // Start xfer cycle
@@ -103,8 +104,8 @@ struct SpiMaster {
     // Check that your compiler unroll's this properly!
 
     uint8_t idx;
-    for (idx = 0; idx < word_size; idx++) {
-      DataWord bit = packer.mask(b, idx, word_size);
+    for (idx = 0; idx < WordSize; idx++) {
+      DataWord bit = packer.mask(b, idx, WordSize);
       bits[idx] = xfer.template xfer_cycle<Clock, Timings>( clock, pins, bit);
     }
 
@@ -113,7 +114,7 @@ struct SpiMaster {
     // needed by AD7730, from CS to rising edge
     unselect(cs);
 
-    return packer.template pack<DataWord>(bits,word_size);
+    return packer.template pack<DataWord>(bits,WordSize);
   }
 };
 
