@@ -96,7 +96,8 @@ inline void SpiClock<Std>::stop() {
 template <BitOrder BITEND>
 struct SpiPack {
   inline uint8_t mask(uint8_t byte, uint8_t idx, const uint32_t word_size);
-  inline uint8_t pack(uint8_t bits[]);
+  template<typename DataWord>
+  inline DataWord pack(uint8_t bits[], const uint8_t word_size);
 };
 
 template<>
@@ -110,17 +111,27 @@ inline uint8_t SpiPack<LsbFirst>::mask(uint8_t byte, uint8_t idx, const uint32_t
 }
 
 template<>
-inline uint8_t SpiPack<MsbFirst>::pack(uint8_t bits[])
+template<typename DataWord>
+inline DataWord SpiPack<MsbFirst>::pack(uint8_t bits[], const uint8_t word_size)
 {
-  return (bits[0] << 7 | bits[1] << 6 | bits[2] << 5 | bits[3] << 4 | bits[4] << 3 | \
-          bits[5] << 2 | bits[6] << 1 | bits[7]);
+  uint8_t i;
+  DataWord word = 0;
+  for (i = 0; i < word_size; i++) {
+    word |= bits[i] << (word_size - i - 1);
+  }
+  return word;
 }
 
 template<>
-inline uint8_t SpiPack<LsbFirst>::pack(uint8_t bits[])
+template<typename DataWord>
+inline DataWord SpiPack<LsbFirst>::pack(uint8_t bits[], const uint8_t word_size)
 {
-  return (bits[0] | bits[1] << 1 | bits[2] << 2 | bits[3] << 3 | bits[4] << 4 | \
-          bits[5] << 5 | bits[6] << 6 | bits[7] << 7);
+  uint8_t i;
+  DataWord word = 0;
+  for (i = 0; i < word_size; i++) {
+    word |= bits[i] << i;
+  }
+  return word;
 }
 
 // ========================================================================== //

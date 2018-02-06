@@ -121,7 +121,7 @@ struct SpiMaster {
     // needed by AD7730, from CS to rising edge
     unselect(cs);
 
-    return packer.pack(bits);
+    return packer.template pack<DataWord>(bits,word_size);
   }
 };
 
