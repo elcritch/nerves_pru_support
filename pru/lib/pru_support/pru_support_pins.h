@@ -23,6 +23,38 @@ typedef uint32_t Pin;
 
 /* #ifdef BB_BLACK | BB_GREEN */
 
+/*
+                                                  --|+|--|--------|------
+             P9                                 /   |+|  |        |       \                     P8
+                                                |   |_|  |        |       |
+  |==========|=====|=====|=============|        |O__     |________|    __O|        |============|======|=====|===========|
+  | DGND     |  1  |  2  | DGND        |        | [|]                 [|] |        | DGND       |   1  |  2  | DGND      |
+  | Vdd 3v3  |  3  |  4  | Vdd 3V3     |        | [|]                 [|] |        | MMC1 DAT 6 |   3  |  4  | MMC1 DAT7 |
+  | Vdd 5v   |  5  |  6  | Vdd 5v      |        | [|]                 [|] |        | MMC1 DAT2  |   5  |  6  | MMC1 DAT3 |
+  | Sys 5v   |  7  |  8  | Sys 5v      |        | [|]                 [|] |        | GPIO 66    |   7  |  8  | GPIO 67   |
+  | PWR BTN  |  9  | 10  | Sys Rst     |        | [|]                 [|] |        | GPIO 69    |   9  | 10  | GPIO 68   |
+  | UART4 RX | 11  | 12  | GPIO 60     |        | [|]                 [|] |        | GPIO 45    |  11  | 12  | GPIO 44   |
+  | UART4 TX | 13  | 14  | PWM1A       |        | [|]                 [|] |        | PWM2B      |  13  | 14  | GPIO 26   |
+  | GPIO 48  | 15  | 16  | PWM1B       |        | [|]                 [|] |        | GPIO 47    |  15  | 16  | GPIO 46   |
+  | SPI0 CS0 | 17  | 18  | SPIO D1     |        | [|]     ........    [|] |        | GPIO 27    |  17  | 18  | GPIO 65   |
+  | I2C2 SCL | 19  | 20  |             |        | [|]     .      .    [|] |        | PWM2A      |  19  | 20  | MMC1 CMD  |
+  | SPIO DO  | 21  | 22  | SPIO SCLK   |        | [|]     . TI   .    [|] |        | MMC1 CLK   |  21  | 22  | MMC1 DAT5 |
+  | GPIO 49  | 23  | 24  | UART1 TX    |        | [|]     .      .    [|] |        | MMC1 DAT4  |  23  | 24  | MMC1 DAT1 |
+  | GPIO 117 | 25  | 26  | UART1 RX    |        | [|]     ........    [|] |        | MMC1 DAT0  |  25  | 26  | GPIO 61   |
+  | GPIO 115 | 27  | 28  | SPI1 CSO    |        | [|]                 [|] |        | LCD VSYNC  |  27  | 28  | LCD PCLK  |
+  | SPI1 DO  | 29  | 30  | GPIO 112    |        | [|]                 [|] |        | LCD HSYNC  |  29  | 30  | LCD ACBias|
+  | SPI1 SCK | 31  | 32  | Vdd ADC     |        | [|]                 [|] |        | LCD DATA14 |  31  | 32  | LCD DATA15|
+  | AIN4     | 33  | 34  | GndA ADC    |        | [|]                 [|] |        | LCD DATA13 |  33  | 34  | LCD DATA11|
+  | AIN6     | 35  | 36  | AIN5        |        | [|]                 [|] |        | LCD DATA12 |  35  | 36  | LCD DATA10|
+  | AIN2     | 37  | 38  | AIN3        |        | [|]                 [|] |        | LCD DATA8  |  37  | 38  | LCD DATA9 |
+  | AIN0     | 39  | 40  | AIN1        |        | [|]                 [|] |        | LCD DATA6  |  39  | 40  | LCD DATA7 |
+  | GPIO 20  | 41  | 42  | PWM0        |        | [|]                 [|] |        | LCD DATA4  |  41  | 42  | LCD DATA5 |
+  | DGND     | 43  | 44  | DGND        |        | [|]                 [|] |        | LCD DATA2  |  43  | 44  | LCD DATA3 |
+  | DGND     | 45  | 46  | DGND        |        | [|] -------         [|] |        | LCD DATA0  |  45  | 46  | LCD DATA1 |
+  |==========|=====|=====|=============|        \     |     |             /        |============|======|=====|===========|
+                                                  ----|     |------------
+                                                      -------
+ */
 /* P8 */
 #define PRU0_GO_P8_11 0x08000 /* r30, 1 << 15, GPIO1[13], GpioUserland 45 */
 #define PRU0_GO_P8_12 0x04000 /* r30, 1 << 14, GPIO1[12], GpioUserland 44 */
