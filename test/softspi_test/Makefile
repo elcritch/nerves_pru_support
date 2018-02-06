@@ -12,7 +12,7 @@ CFLAGS= -O3 -g  -std=c++11  -DPRU_SUPPORT_OVERRIDE_R30 -DPRU_SUPPORT_OVERRIDE_R3
 SOURCES=$(wildcard *.cpp)
 #Using .object instead of .obj in order to not conflict with the CCS build process
 OBJECTS=$(SOURCES:.cpp=.o)
-TARGETS=$(OBJECTS:.o=_test)
+TARGETS=$(OBJECTS:.o=_run)
 
 test: all
 
@@ -30,7 +30,7 @@ printEnd:
 	@echo ''
 
 # Invokes the archiver to make the .lib file
-%_test: %.cpp
+%_run: %.cpp
 	@echo ''
 	@echo 'Building target: $@'
 	$(CXX) $(INCLUDE) $(CFLAGS) -o $@ $<
