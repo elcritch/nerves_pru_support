@@ -50,7 +50,7 @@ typedef uint32_t Pin;
   | UART4 TX | 13  | 14  | PWM1A       |        | [|]                 [|] |        | PWM2B      |  13  | 14  | GPIO 26     |   ... row 7
   | GPIO 48  | 15  | 16  | PWM1B       |        | [|]                 [|] |        | GPIO 47    |  15^ | 16^ | GPIO 46     |   ... row 8
   | SPI0 CS0 | 17  | 18  | SPIO D1     |        | [|]     ........    [|] |        | GPIO 27    |  17  | 18  | GPIO 65     |   ... row 9
-  | I2C2 SCL | 19  | 20  |             |        | [|]     .      .    [|] |        | PWM2A      |  19  | 20@ | MMC1 CMD    |   ... row 10
+  | I2C2 SCL | 19  | 20  | I2C2 SDA    |        | [|]     .      .    [|] |        | PWM2A      |  19  | 20@ | MMC1 CMD    |   ... row 10
   | SPIO DO  | 21  | 22  | SPIO SCLK   |        | [|]     . TI   .    [|] |        | MMC1 CLK   |  21@ | 22  | MMC1 DAT5   |   ... row 11
   | GPIO 49  | 23  | 24^ | UART1 TX    |        | [|]     .      .    [|] |        | MMC1 DAT4  |  23  | 24  | MMC1 DAT1   |   ... row 12
   | GPIO 117 | 25@ | 26^ | UART1 RX    |        | [|]     ........    [|] |        | MMC1 DAT0  |  25  | 26  | GPIO 61     |   ... row 13
