@@ -51,6 +51,8 @@ struct IOPins {
 
 }
 
+#define WordSize(X) ( 8*sizeof(X) )
+
 #include "spi_helpers.hpp"
 
 // #ifndef NOOP
@@ -59,13 +61,10 @@ struct IOPins {
 // #define NOOP __delay_cycles(1)
 // #endif
 
-#define WordSize ( 8*sizeof(DataWord) )
 
 namespace SoftSPI {
 
-
-template <typename DataWord,
-          Polarity CPOL,
+template <Polarity CPOL,
           PollEdge CPHA,
           BitOrder BITEND,
           template <Polarity> class ClockType,
@@ -89,8 +88,9 @@ struct SpiMaster {
   inline void select(Pin cs) { digitalWrite(cs, LOW); }
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
-  uint8_t transfer(Pin cs, DataWord b) {
-    DataWord bits[WordSize];
+  template<typename DataWord>
+  DataWord transfer(Pin cs, DataWord b) {
+    DataWord bits[WordSize(DataWord)];
     this->__xfers++;
 
     digitalWrite(pins.mosi, LOW);
@@ -105,8 +105,8 @@ struct SpiMaster {
     // Check that your compiler unroll's this properly!
 
     uint8_t idx;
-    for (idx = 0; idx < WordSize; idx++) {
-      DataWord bit = packer.mask(b, idx, WordSize);
+    for (idx = 0; idx < WordSize(DataWord); idx++) {
+      DataWord bit = packer.mask(b, idx, WordSize(DataWord));
       bits[idx] = xfer.template xfer_cycle<Clock, Timings>( clock, pins, bit);
     }
 
@@ -117,7 +117,7 @@ struct SpiMaster {
     digitalWrite(pins.mosi, HIGH);
     // needed by AD7730, from CS to rising edge
 
-    return packer.template pack<DataWord>(bits,WordSize);
+    return packer.template pack<DataWord>(bits);
   }
 };
 

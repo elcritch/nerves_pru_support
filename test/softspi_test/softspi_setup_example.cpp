@@ -62,11 +62,12 @@ int main() {
   uint8_t out;
 
   // Mode 0
-  SpiMaster<uint8_t, Polarity::Std, PollEdge::Rising, MsbFirst, SpiClockToggler, Timings> spi0(pins);
+  SpiMaster<Polarity::Std, PollEdge::Rising, MsbFirst, SpiClockToggler, Timings> spi0(pins);
 
   std::cout << "\nRunning... mode 0" << std::endl;
 
-  out = spi0.transfer(7, 0xAA);
+  uint8_t byte = 0xAA;
+  out = spi0.transfer(7, byte);
 
 
   std::cout << "\nDone: cout: " ;
