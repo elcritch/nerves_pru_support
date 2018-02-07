@@ -91,7 +91,7 @@ template <BitOrder BITEND>
 struct SpiPack {
   inline bool mask(uint8_t byte, uint8_t idx, const uint32_t word_size);
   template<typename DataWord>
-  inline DataWord pack(uint8_t bits[]);
+  inline DataWord pack(bool bits[]);
 };
 
 template<>
@@ -106,7 +106,7 @@ inline bool SpiPack<LsbFirst>::mask(uint8_t byte, uint8_t idx, const uint32_t wo
 
 template<>
 template<typename DataWord>
-inline DataWord SpiPack<MsbFirst>::pack(uint8_t bits[])
+inline DataWord SpiPack<MsbFirst>::pack(bool bits[])
 {
   uint8_t i;
   DataWord word = 0;
@@ -118,7 +118,7 @@ inline DataWord SpiPack<MsbFirst>::pack(uint8_t bits[])
 
 template<>
 template<typename DataWord>
-inline DataWord SpiPack<LsbFirst>::pack(uint8_t bits[])
+inline DataWord SpiPack<LsbFirst>::pack(bool bits[])
 {
   uint8_t i;
   DataWord word = 0;

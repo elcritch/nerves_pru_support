@@ -90,7 +90,7 @@ struct SpiMaster {
 
   template<typename DataWord>
   DataWord transfer(Pin cs, DataWord b) {
-    DataWord bits[WordSize(DataWord)];
+    bool bits[WordSize(DataWord)];
     this->__xfers++;
 
     digitalWrite(pins.mosi, LOW);
