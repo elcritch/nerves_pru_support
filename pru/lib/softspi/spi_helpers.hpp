@@ -19,11 +19,11 @@ template<uint32_t sck_cycle,
          template<uint32_t d> class DelayImpl>
 struct ClockTimings {
 
-  static inline void delayCycles() { DelayImpl<sck_cycle>(); }
-  static inline void delayCyclesP0() { DelayImpl<prop_pre>(); }
-  static inline void delayCyclesP1() { DelayImpl<prop_post>(); }
-  static inline void delayCyclesC0() { DelayImpl<capt_pre>(); }
-  static inline void delayCyclesC1() { DelayImpl<capt_post>(); }
+  static inline void delayCycles() { DelayImpl<sck_cycle>()(); }
+  static inline void delayCyclesP0() { DelayImpl<prop_pre>()(); }
+  static inline void delayCyclesP1() { DelayImpl<prop_post>()(); }
+  static inline void delayCyclesC0() { DelayImpl<capt_pre>()(); }
+  static inline void delayCyclesC1() { DelayImpl<capt_post>()(); }
 };
 
 
