@@ -48,8 +48,9 @@ void digitalToggle(uint32_t gpio_bitmask) {
 
 #include <bitset>
 
+template<uint32_t CYCLES>
 struct ClockDelay {
-  static void delay(uint32_t cycles) {
+  void operator()() {
   }
 };
 

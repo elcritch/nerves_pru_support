@@ -11,32 +11,21 @@
 
 namespace SoftSPI {
 
-
 template<uint32_t sck_cycle,
-         uint32_t prop_pre,
-         uint32_t prop_post,
-         uint32_t capt_pre,
-         uint32_t capt_post,
-         class DelayImpl>
+          uint32_t prop_pre,
+          uint32_t prop_post,
+          uint32_t capt_pre,
+          uint32_t capt_post,
+         template<uint32_t d> class DelayImpl>
 struct ClockTimings {
 
-  static inline void delayCycles() { DelayImpl::delay(sck_cycle); }
-  static inline void delayCyclesP0() { DelayImpl::delay(prop_pre); }
-  static inline void delayCyclesP1() { DelayImpl::delay(prop_post); }
-  static inline void delayCyclesC0() { DelayImpl::delay(capt_pre); }
-  static inline void delayCyclesC1() { DelayImpl::delay(capt_post); }
-
-  // static void delayCycles(uint32_t cycles);
-
-  // static void delay(uint32_t cycles);
-
-  // static void delay(uint32_t cycles) {
-  //   uint32_t i;
-  //   for (i = 0; i < cycles; ++i) {
-  //     NOOP;
-  //   }
-  // }
+  static inline void delayCycles() { DelayImpl<sck_cycle>(); }
+  static inline void delayCyclesP0() { DelayImpl<prop_pre>(); }
+  static inline void delayCyclesP1() { DelayImpl<prop_post>(); }
+  static inline void delayCyclesC0() { DelayImpl<capt_pre>(); }
+  static inline void delayCyclesC1() { DelayImpl<capt_post>(); }
 };
+
 
 // ========================================================================== //
 // SPI Clock

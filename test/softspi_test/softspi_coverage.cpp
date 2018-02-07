@@ -181,10 +181,12 @@ void printCycleData(uint8_t out) {
 
 };
 
+template<uint32_t CYCLES>
 struct ClockDelay {
-  static void delay(uint32_t cycles) {
-    for (int i = 0; i < cycles; i++)
+  void operator()() {
+    for (int i = 0; i < CYCLES; i++) {
       delay_test_cycles();
+    }
   }
 };
 
