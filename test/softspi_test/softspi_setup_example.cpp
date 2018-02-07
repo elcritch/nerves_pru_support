@@ -11,7 +11,7 @@ volatile uint32_t __R30;
 
 #define MAX_CYCLES 4096
 
-#define NOOP 
+// #define NOOP 
 #define PRU_SUPPORT_OVERRIDE_GPIO_FUNCS
 
 void digitalWrite(uint32_t gpio_bitmask, uint32_t state);
@@ -48,7 +48,12 @@ void digitalToggle(uint32_t gpio_bitmask) {
 
 #include <bitset>
 
-typedef ClockTimings<10,5,0,5,0> Timings;
+struct ClockDelay {
+  static void delay(uint32_t cycles) {
+  }
+};
+
+typedef ClockTimings<10,5,0,5,0, ClockDelay> Timings;
 
 int main() {
 

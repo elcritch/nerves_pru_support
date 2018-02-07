@@ -111,6 +111,7 @@ struct SpiMaster {
     }
 
     unselect(cs);
+
     Timings::delayCycles(); // checking timing characteristics, it is no
 
     digitalWrite(pins.mosi, HIGH);

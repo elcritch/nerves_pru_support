@@ -101,7 +101,7 @@ void digitalWrite(uint32_t gpio_bitmask, bool state);
 bool digitalRead(uint32_t gpio_bitmask);
 void digitalToggle(uint32_t gpio_bitmask);
 
-#define NOOP delay_test_cycles()
+// #define NOOP delay_test_cycles()
 #define PRU_SUPPORT_OVERRIDE_GPIO_FUNCS
 
 #include <softspi.hpp>
@@ -181,7 +181,14 @@ void printCycleData(uint8_t out) {
 
 };
 
-typedef ClockTimings<7,0,5,0,5> Timings;
+struct ClockDelay {
+  static void delay(uint32_t cycles) {
+    for (int i = 0; i < cycles; i++)
+      delay_test_cycles();
+  }
+};
+
+typedef ClockTimings<7,0,5,0,5, ClockDelay> Timings;
 
 int main() {
 
