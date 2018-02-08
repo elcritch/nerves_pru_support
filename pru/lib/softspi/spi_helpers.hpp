@@ -135,12 +135,12 @@ template <PollEdge CPHA = Rising>
 struct SpiXfer {
 
   template <class Clock, class Timings>
-  inline uint8_t xfer_cycle( Clock clock, IOPins pins, bool bit);
+  inline uint8_t xfer_cycle( Clock clock, IOPins pins, uint32_t bit);
 };
 
 template <>
 template <class Clock, class Timings>
-uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, bool bit)
+uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, uint32_t value)
 {
   bool read = 0;
 
@@ -148,7 +148,7 @@ uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, bool bit)
 
   Timings::delayCyclesP0();
 
-  digitalWrite(pins.mosi, bit ? HIGH : LOW);
+  digitalWrite(pins.mosi, -value);
 
   // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
   Timings::delayCyclesP1(); //  propagation
@@ -167,12 +167,12 @@ uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, bool bit)
 
 template <>
 template <class Clock, class Timings>
-uint8_t SpiXfer<Rising>::xfer_cycle( Clock clock, IOPins pins, bool bit)
+uint8_t SpiXfer<Rising>::xfer_cycle( Clock clock, IOPins pins, uint32_t value)
 {
   bool read = 0;
 
   // changing MOSI big while SCK low, propogation
-  digitalWrite(pins.mosi, bit ? HIGH : LOW);
+  digitalWrite(pins.mosi, -value);
 
   // there is a requirement of LOW and HIGH have identical interval!
   Timings::delayCyclesP1();
