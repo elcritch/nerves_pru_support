@@ -112,9 +112,10 @@ struct SpiMaster {
 
     unselect(cs);
 
+    digitalWrite(pins.mosi, LOW);
+
     Timings::delayCycles(); // checking timing characteristics, it is no
 
-    digitalWrite(pins.mosi, HIGH);
     // needed by AD7730, from CS to rising edge
 
     return packer.template pack<DataWord>(bits);
