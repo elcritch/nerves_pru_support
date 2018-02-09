@@ -197,7 +197,7 @@ int main() {
   uint8_t out;
 
   // Mode 0
-  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings> spi0;
+  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings, SpiXfer> spi0;
 
   SimpleCycleTiming<SPIPins, Pin> _cycle_data0;
   cycle_data = &_cycle_data0;
@@ -210,7 +210,7 @@ int main() {
   printCycleData(out);
 
   // Mode 1
-  SpiMaster<Polarity::Std, DataTxEdge::TxClockRise, MsbFirst, SpiClock, Timings> spi1;
+  SpiMaster<Polarity::Std, DataTxEdge::TxClockRise, MsbFirst, SpiClock, Timings, SpiXfer> spi1;
 
   SimpleCycleTiming<SPIPins, Pin> _cycle_data1;
   cycle_data = &_cycle_data1;
@@ -222,7 +222,7 @@ int main() {
   printCycleData(out);
 
   // Mode 2
-  SpiMaster<Polarity::Inv, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings> spi2;
+  SpiMaster<Polarity::Inv, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings, SpiXfer> spi2;
 
   SimpleCycleTiming<SPIPins, Pin> _cycle_data2;
   cycle_data = &_cycle_data2;
@@ -233,7 +233,7 @@ int main() {
   printCycleData(out);
 
   // Mode 3
-  SpiMaster<Polarity::Inv, DataTxEdge::TxClockRise, MsbFirst, SpiClock, Timings> spi3;
+  SpiMaster<Polarity::Inv, DataTxEdge::TxClockRise, MsbFirst, SpiClock, Timings, SpiXfer> spi3;
 
   SimpleCycleTiming<SPIPins, Pin> _cycle_data3;
   cycle_data = &_cycle_data3;
@@ -245,7 +245,7 @@ int main() {
   printCycleData(out);
 
   // Mode 0 - MSB
-  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings> spi0msb;
+  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings, SpiXfer> spi0msb;
 
   SimpleCycleTiming<SPIPins, Pin> _cycle_data0a;
   cycle_data = &_cycle_data0a;
@@ -257,7 +257,7 @@ int main() {
   printCycleData(out);
 
   // Mode 0 - LSB
-  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, LsbFirst, SpiClock, Timings> spi0lsb;
+  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, LsbFirst, SpiClock, Timings, SpiXfer> spi0lsb;
 
   SimpleCycleTiming<SPIPins, Pin> _cycle_data1a;
   cycle_data = &_cycle_data1a;

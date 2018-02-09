@@ -74,16 +74,17 @@ template <Polarity CPOL,
           DataTxEdge CPHA,
           BitOrder BITEND,
           template <Polarity> class ClockType,
-          typename Timings>
+          typename Timings,
+          template <DataTxEdge> class _Xfer>
 struct SpiMaster {
 
   typedef ClockType<CPOL> Clock;
   typedef SpiPack<BITEND> Packer;
-  typedef SpiXfer<CPHA> Xfer;
+  typedef _Xfer<CPHA> Xfer;
 
   // const ClockTimings timings;
-  Xfer xfer;
   Packer packer;
+  Xfer xfer;
 
   uint64_t __xfers;
 

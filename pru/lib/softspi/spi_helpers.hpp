@@ -33,6 +33,9 @@ struct ClockTimings {
 template <Polarity CPOL>
 struct SpiClock {
 
+  static uint32_t on();
+  static uint32_t off();
+
   template<class IOPins>
   static void tick();
 
@@ -48,11 +51,15 @@ template<class IOPins>
 inline void SpiClock<Inv>::tick() {
   digitalWrite(IOPins::sck(), LOW);
 }
+
 template<>
 template<class IOPins>
 inline void SpiClock<Inv>::tock() {
   digitalWrite(IOPins::sck(), HIGH);
 }
+
+template<> uint32_t SpiClock<Inv>::on() { return LOW; }
+template<> uint32_t SpiClock<Inv>::off() { return HIGH; }
 
 //  clock standard
 template<>
@@ -65,6 +72,9 @@ template<class IOPins>
 inline void SpiClock<Std>::tock() {
   digitalWrite(IOPins::sck(), LOW);
 }
+
+template<> uint32_t SpiClock<Std>::on() { return HIGH; }
+template<> uint32_t SpiClock<Std>::off() { return LOW; }
 
 // template <Polarity CPOL>
 // struct SpiClockToggler {

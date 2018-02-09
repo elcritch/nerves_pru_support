@@ -56,13 +56,15 @@ struct ClockDelay {
 
 typedef ClockTimings<10,5,0,5,0, ClockDelay> Timings;
 typedef IOPins<10, 11, 14> SPIPins;
+// typedef SpiXfer<TxClockFall> Xfer;
+//typedef SpiXfer Xfer;
 
 int main() {
 
   uint8_t out;
 
   // Mode 0
-  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings> spi0;
+  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings, SpiXfer> spi0;
 
   std::cout << "\nRunning... mode 0" << std::endl;
 
