@@ -100,7 +100,7 @@ inline void digitalWrite(uint32_t gpio_bitmask, uint32_t state) {
 inline bool digitalRead(uint32_t gpio_bitmask) {
   // 1 cycle read for R31, 1 inst for &, 1 inst for gt
   // est. 3 cycles
-  return (__R31 & gpio_bitmask) > 0;
+  return !!(__R31 & gpio_bitmask);
 }
 
 inline void digitalToggle(uint32_t gpio_bitmask) {
