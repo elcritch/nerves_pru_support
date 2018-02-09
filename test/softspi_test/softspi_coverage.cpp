@@ -46,22 +46,20 @@ template<class IOPins, typename Pin>
 struct SimpleCycleTiming {
 
   PinState states[MAX_CYCLES];
-  IOPins pins;
 
   uint64_t cycle;
   PinState current;
 
-  SimpleCycleTiming() : cycle(0), pins({0,0,0}) {}
-  SimpleCycleTiming(IOPins _p) : cycle(0), pins(_p) {}
+  SimpleCycleTiming() : cycle(0) {}
 
   void set_pin(Pin pin, uint32_t state) {
-    if (pin == pins.mosi) {
+    if (pin == IOPins::mosi()) {
       this->current.mosi = state;
       this->current.miso = !state;
     }
-    else if (pin == pins.miso)
+    else if (pin == IOPins::miso())
       this->current.miso = state;
-    else if (pin == pins.sck)
+    else if (pin == IOPins::sck())
       this->current.sck = state;
     else {
       this->current.other_pin = pin;
@@ -70,15 +68,15 @@ struct SimpleCycleTiming {
   }
 
   bool get_pin(Pin pin) {
-    if (pin == pins.mosi)
+    if (pin == IOPins::mosi())
       return this->current.mosi;
-    else if (pin == pins.miso)
+    else if (pin == IOPins::miso())
     {
         uint8_t ret = this->current.miso;
         this->current.miso = 2+ret;
         return ret;
     }
-    else if (pin == pins.sck)
+    else if (pin == IOPins::sck())
       return this->current.sck;
     else if (pin == current.other_pin) {
       uint8_t ret =  this->current.other_state;
@@ -108,7 +106,9 @@ void digitalToggle(uint32_t gpio_bitmask);
 
 using namespace SoftSPI;
 
-SimpleCycleTiming<IOPins, Pin> * cycle_data;
+typedef IOPins<10, 11, 14> SPIPins;
+
+SimpleCycleTiming<SPIPins, Pin> * cycle_data;
 
 void delay_test_cycles() {
   cycle_data->incr();
@@ -194,79 +194,78 @@ typedef ClockTimings<7,0,5,0,5, ClockDelay> Timings;
 
 int main() {
 
-  IOPins pins = { .miso = 10, .mosi = 11, .sck = 14 };
   uint8_t out;
 
   // Mode 0
-  SpiMaster<Polarity::Std, PollEdge::Rising, MsbFirst, SpiClock, Timings> spi0(pins);
+  SpiMaster<Polarity::Std, PollEdge::Rising, MsbFirst, SpiClock, Timings> spi0;
 
-  SimpleCycleTiming<IOPins, Pin> _cycle_data0(pins);
+  SimpleCycleTiming<SPIPins, Pin> _cycle_data0;
   cycle_data = &_cycle_data0;
   // cycle_data.pins = pins;
 
   std::cout << "\nRunning... mode 0" << std::endl;
 
   digitalWrite(7, HIGH);
-  out = spi0.transfer<uint8_t>(7, 0xAA);
+  out = spi0.transfer<uint8_t, SPIPins>(7, 0xAA);
   printCycleData(out);
 
   // Mode 1
-  SpiMaster<Polarity::Std, PollEdge::Falling, MsbFirst, SpiClock, Timings> spi1(pins);
+  SpiMaster<Polarity::Std, PollEdge::Falling, MsbFirst, SpiClock, Timings> spi1;
 
-  SimpleCycleTiming<IOPins, Pin> _cycle_data1(pins);
+  SimpleCycleTiming<SPIPins, Pin> _cycle_data1;
   cycle_data = &_cycle_data1;
 
   std::cout << "\nRunning... mode 1" << std::endl;
 
   digitalWrite(8, HIGH);
-  out = spi1.transfer<uint8_t>(8, 0xAA);
+  out = spi1.transfer<uint8_t, SPIPins>(8, 0xAA);
   printCycleData(out);
 
   // Mode 2
-  SpiMaster<Polarity::Inv, PollEdge::Rising, MsbFirst, SpiClock, Timings> spi2(pins);
+  SpiMaster<Polarity::Inv, PollEdge::Rising, MsbFirst, SpiClock, Timings> spi2;
 
-  SimpleCycleTiming<IOPins, Pin> _cycle_data2(pins);
+  SimpleCycleTiming<SPIPins, Pin> _cycle_data2;
   cycle_data = &_cycle_data2;
   std::cout << "\nRunning... mode 2" << std::endl;
 
   digitalWrite(7, HIGH);
-  out = spi2.transfer<uint8_t>(7, 0xAA);
+  out = spi2.transfer<uint8_t, SPIPins>(7, 0xAA);
   printCycleData(out);
 
   // Mode 3
-  SpiMaster<Polarity::Inv, PollEdge::Falling, MsbFirst, SpiClock, Timings> spi3(pins);
+  SpiMaster<Polarity::Inv, PollEdge::Falling, MsbFirst, SpiClock, Timings> spi3;
 
-  SimpleCycleTiming<IOPins, Pin> _cycle_data3(pins);
+  SimpleCycleTiming<SPIPins, Pin> _cycle_data3;
   cycle_data = &_cycle_data3;
 
   std::cout << "\nRunning... mode 3" << std::endl;
 
   digitalWrite(8, HIGH);
-  out = spi3.transfer<uint8_t>(8, 0xAA);
+  out = spi3.transfer<uint8_t, SPIPins>(8, 0xAA);
   printCycleData(out);
 
   // Mode 0 - MSB
-  SpiMaster<Polarity::Std, PollEdge::Rising, MsbFirst, SpiClock, Timings> spi0msb(pins);
+  SpiMaster<Polarity::Std, PollEdge::Rising, MsbFirst, SpiClock, Timings> spi0msb;
 
-  SimpleCycleTiming<IOPins, Pin> _cycle_data0a(pins);
+  SimpleCycleTiming<SPIPins, Pin> _cycle_data0a;
   cycle_data = &_cycle_data0a;
 
   std::cout << "\nRunning... mode 0 / msb / 0xAF" << std::endl;
 
   digitalWrite(8, HIGH);
-  out = spi0msb.transfer<uint8_t>(8, 0xAF);
+  out = spi0msb.transfer<uint8_t, SPIPins>(8, 0xAF);
   printCycleData(out);
 
   // Mode 0 - LSB
-  SpiMaster<Polarity::Std, PollEdge::Rising, LsbFirst, SpiClock, Timings> spi0lsb(pins);
+  SpiMaster<Polarity::Std, PollEdge::Rising, LsbFirst, SpiClock, Timings> spi0lsb;
 
-  SimpleCycleTiming<IOPins, Pin> _cycle_data1a(pins);
+  SimpleCycleTiming<SPIPins, Pin> _cycle_data1a;
   cycle_data = &_cycle_data1a;
 
   std::cout << "\nRunning... mode 0 / lsb / 0xAF" << std::endl;
 
   digitalWrite(8, HIGH);
-  out = spi0lsb.transfer<uint8_t>(8, 0xAF);
+  out = spi0lsb.transfer<uint8_t, SPIPins>(8, 0xAF);
   printCycleData(out);
 
   return 0;

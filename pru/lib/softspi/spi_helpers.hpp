@@ -33,56 +33,50 @@ struct ClockTimings {
 template <Polarity CPOL>
 struct SpiClock {
 
-  const Pin sck;
+  template<class IOPins>
+  static void tick();
 
-  SpiClock(Pin _s) : sck(_s) {}
-
-  inline void start();
-  inline void stop();
-
-  inline void tick() {
-    start();
-  }
-  inline void tock() {
-    stop();
-  }
+  template<class IOPins>
+  static void tock();
 
 };
 
-template <Polarity CPOL>
-struct SpiClockToggler : SpiClock<CPOL> {
-
-  SpiClockToggler(Pin _s) : SpiClock<CPOL>(_s) {}
-
-  inline void tick() {
-    digitalToggle(SpiClock<CPOL>::sck);
-  }
-  inline void tock() {
-    digitalToggle(SpiClock<CPOL>::sck);
-  }
-
-};
 
 //  clock inverted
 template<>
-inline void SpiClock<Inv>::start() {
-  digitalWrite(sck, LOW);
+template<class IOPins>
+inline void SpiClock<Inv>::tick() {
+  digitalWrite(IOPins::sck(), LOW);
 }
 template<>
-inline void SpiClock<Inv>::stop() {
-  digitalWrite(sck, HIGH);
+template<class IOPins>
+inline void SpiClock<Inv>::tock() {
+  digitalWrite(IOPins::sck(), HIGH);
 }
 
 //  clock standard
 template<>
-inline void SpiClock<Std>::start() {
-  digitalWrite(sck, HIGH);
+template<class IOPins>
+inline void SpiClock<Std>::tick() {
+  digitalWrite(IOPins::sck(), HIGH);
 }
 template<>
-inline void SpiClock<Std>::stop() {
-  digitalWrite(sck, LOW);
+template<class IOPins>
+inline void SpiClock<Std>::tock() {
+  digitalWrite(IOPins::sck(), LOW);
 }
 
+// template <Polarity CPOL>
+// struct SpiClockToggler {
+
+//   static inline void tick() {
+//     digitalToggle(SpiClock<CPOL>::sck);
+//   }
+//   static inline void tock() {
+//     digitalToggle(SpiClock<CPOL>::sck);
+//   }
+
+// };
 
 // ========================================================================== //
 // SPI BitPack
@@ -134,30 +128,30 @@ inline DataWord SpiPack<LsbFirst>::pack(bool bits[])
 template <PollEdge CPHA = Rising>
 struct SpiXfer {
 
-  template <class Clock, class Timings>
-  inline uint8_t xfer_cycle( Clock clock, Pin mosi, Pin miso, uint32_t bit);
+  template <class Clock, class Timings, class IOPins>
+  inline uint8_t xfer_cycle(uint32_t bit);
 };
 
 template <>
-template <class Clock, class Timings>
-uint8_t SpiXfer<Falling>::xfer_cycle( Clock clock, Pin mosi, Pin miso, uint32_t value)
+template <class Clock, class Timings, class IOPins>
+  uint8_t SpiXfer<Falling>::xfer_cycle(uint32_t value)
 {
-  bool read = 0;
+  uint8_t read = 0;
 
-  clock.tick();
+  Clock::template tick<IOPins>();
 
   Timings::delayCyclesP0();
 
-  digitalWrite(mosi, -value);
+  digitalWrite(IOPins::mosi(), -value);
 
   // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
   Timings::delayCyclesP1(); //  propagation
 
-  clock.tock();
+  Clock::template tock<IOPins>();
 
   Timings::delayCyclesC0(); // holding low, so there is enough time for data preparation and changing
 
-  read = digitalRead(miso); // reading at the middle of SCK pulse
+  read = digitalRead(IOPins::miso()); // reading at the middle of SCK pulse
 
   // wait until data is fetched by slave device,  while SCK low, checking DATAsheet for this interval
   Timings::delayCyclesC1();
@@ -166,27 +160,29 @@ uint8_t SpiXfer<Falling>::xfer_cycle( Clock clock, Pin mosi, Pin miso, uint32_t 
 }
 
 template <>
-template <class Clock, class Timings>
-uint8_t SpiXfer<Rising>::xfer_cycle( Clock clock, Pin mosi, Pin miso, uint32_t value)
+template <class Clock, class Timings, class IOPins>
+uint8_t SpiXfer<Rising>::xfer_cycle(uint32_t value)
 {
-  bool read = 0;
+  uint8_t read = 0;
 
   // changing MOSI big while SCK low, propogation
-  digitalWrite(mosi, -value);
+  digitalWrite(IOPins::mosi(), -value);
 
   // there is a requirement of LOW and HIGH have identical interval!
   Timings::delayCyclesP1();
 
-  clock.tick();
+  Clock::template tick<IOPins>();
+
   // reading at the middle of SCK pulse
   Timings::delayCyclesC0();
 
-  read = digitalRead(miso); // reading at the middle of SCK pulse
+  read = digitalRead(IOPins::miso()); // reading at the middle of SCK pulse
 
   // wait until data is fetched by slave device,  while SCK high, checking DATAsheet for this interval
   Timings::delayCyclesC1();
 
-  clock.tock();
+  Clock::template tock<IOPins>();
+  
   Timings::delayCyclesP0(); // holding low, so there is enough time for data preparation and changing
 
   return read;

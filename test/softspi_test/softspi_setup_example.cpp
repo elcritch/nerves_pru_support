@@ -55,19 +55,19 @@ struct ClockDelay {
 };
 
 typedef ClockTimings<10,5,0,5,0, ClockDelay> Timings;
+typedef IOPins<10, 11, 14> SPIPins;
 
 int main() {
 
-  IOPins pins = { .miso = 10, .mosi = 11, .sck = 14 };
   uint8_t out;
 
   // Mode 0
-  SpiMaster<Polarity::Std, PollEdge::Rising, MsbFirst, SpiClockToggler, Timings> spi0(pins);
+  SpiMaster<Polarity::Std, PollEdge::Rising, MsbFirst, SpiClock, Timings> spi0;
 
   std::cout << "\nRunning... mode 0" << std::endl;
 
   uint8_t byte = 0xAA;
-  out = spi0.transfer(7, byte);
+  out = spi0.transfer<uint8_t, SPIPins>(7, byte);
 
 
   std::cout << "\nDone: cout: " ;

@@ -43,10 +43,11 @@ enum PollEdge {
 
 typedef uint32_t Pin;
 
+template<Pin MISO, Pin MOSI, Pin SCK>
 struct IOPins {
-  const Pin miso;
-  const Pin mosi;
-  const Pin sck;
+  static inline Pin miso() { return MISO; };
+  static inline Pin mosi() { return MOSI; };
+  static inline Pin sck() { return SCK; };
 };
 
 }
@@ -75,31 +76,27 @@ struct SpiMaster {
   typedef SpiPack<BITEND> Packer;
   typedef SpiXfer<CPHA> Xfer;
 
-  const IOPins pins;
   // const ClockTimings timings;
-  Clock clock;
   Xfer xfer;
   Packer packer;
 
   uint64_t __xfers;
 
-  SpiMaster(IOPins _p) : pins(_p), clock(pins.sck), __xfers(0) {}
+  SpiMaster() : __xfers(0) {}
 
   inline void select(Pin cs) { digitalWrite(cs, LOW); }
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
-  template<typename DataWord>
+  template<typename DataWord, class IOPins>
   DataWord transfer(Pin cs, DataWord b) {
-    Pin mosi = pins.mosi;
-    Pin miso = pins.miso;
 
     bool bits[WordSize(DataWord)];
     this->__xfers++;
 
-    digitalWrite(mosi, LOW);
+    digitalWrite(IOPins::mosi(), LOW);
 
     // Start xfer cycle
-    clock.tock();
+    Clock::template tock<IOPins>();
 
     // Here, delay is added, to make CPHA=1 and CPHA=0 both work!
     Timings::delayCycles();
@@ -110,12 +107,11 @@ struct SpiMaster {
     uint8_t idx;
     for (idx = 0; idx < WordSize(DataWord); idx++) {
       DataWord bit = packer.mask(b, idx, WordSize(DataWord));
-      bits[idx] = xfer.template xfer_cycle<Clock, Timings>( clock, mosi, miso, bit);
+      bits[idx] = xfer.template xfer_cycle<Clock, Timings, IOPins>(bit);
     }
 
     unselect(cs);
-
-    digitalWrite(mosi, LOW);
+    digitalWrite(IOPins::mosi(), LOW);
 
     Timings::delayCycles(); // checking timing characteristics, it is no
 
