@@ -135,12 +135,12 @@ template <PollEdge CPHA = Rising>
 struct SpiXfer {
 
   template <class Clock, class Timings>
-  inline uint8_t xfer_cycle( Clock clock, IOPins pins, uint32_t bit);
+  inline uint8_t xfer_cycle( Clock clock, Pin mosi, Pin miso, uint32_t bit);
 };
 
 template <>
 template <class Clock, class Timings>
-uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, uint32_t value)
+uint8_t SpiXfer<Falling>::xfer_cycle( Clock clock, Pin mosi, Pin miso, uint32_t value)
 {
   bool read = 0;
 
@@ -148,7 +148,7 @@ uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, uint32_t value)
 
   Timings::delayCyclesP0();
 
-  digitalWrite(pins.mosi, -value);
+  digitalWrite(mosi, -value);
 
   // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
   Timings::delayCyclesP1(); //  propagation
@@ -157,7 +157,7 @@ uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, uint32_t value)
 
   Timings::delayCyclesC0(); // holding low, so there is enough time for data preparation and changing
 
-  read = digitalRead(pins.miso); // reading at the middle of SCK pulse
+  read = digitalRead(miso); // reading at the middle of SCK pulse
 
   // wait until data is fetched by slave device,  while SCK low, checking DATAsheet for this interval
   Timings::delayCyclesC1();
@@ -167,12 +167,12 @@ uint8_t SpiXfer<Falling>::xfer_cycle(Clock clock, IOPins pins, uint32_t value)
 
 template <>
 template <class Clock, class Timings>
-uint8_t SpiXfer<Rising>::xfer_cycle( Clock clock, IOPins pins, uint32_t value)
+uint8_t SpiXfer<Rising>::xfer_cycle( Clock clock, Pin mosi, Pin miso, uint32_t value)
 {
   bool read = 0;
 
   // changing MOSI big while SCK low, propogation
-  digitalWrite(pins.mosi, -value);
+  digitalWrite(mosi, -value);
 
   // there is a requirement of LOW and HIGH have identical interval!
   Timings::delayCyclesP1();
@@ -181,7 +181,7 @@ uint8_t SpiXfer<Rising>::xfer_cycle( Clock clock, IOPins pins, uint32_t value)
   // reading at the middle of SCK pulse
   Timings::delayCyclesC0();
 
-  read = digitalRead(pins.miso); // reading at the middle of SCK pulse
+  read = digitalRead(miso); // reading at the middle of SCK pulse
 
   // wait until data is fetched by slave device,  while SCK high, checking DATAsheet for this interval
   Timings::delayCyclesC1();

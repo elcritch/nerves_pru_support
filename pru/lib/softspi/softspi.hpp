@@ -90,10 +90,13 @@ struct SpiMaster {
 
   template<typename DataWord>
   DataWord transfer(Pin cs, DataWord b) {
+    Pin mosi = pins.mosi;
+    Pin miso = pins.miso;
+
     bool bits[WordSize(DataWord)];
     this->__xfers++;
 
-    digitalWrite(pins.mosi, LOW);
+    digitalWrite(mosi, LOW);
 
     // Start xfer cycle
     clock.tock();
@@ -107,12 +110,12 @@ struct SpiMaster {
     uint8_t idx;
     for (idx = 0; idx < WordSize(DataWord); idx++) {
       DataWord bit = packer.mask(b, idx, WordSize(DataWord));
-      bits[idx] = xfer.template xfer_cycle<Clock, Timings>( clock, pins, bit);
+      bits[idx] = xfer.template xfer_cycle<Clock, Timings>( clock, mosi, miso, bit);
     }
 
     unselect(cs);
 
-    digitalWrite(pins.mosi, LOW);
+    digitalWrite(mosi, LOW);
 
     Timings::delayCycles(); // checking timing characteristics, it is no
 
