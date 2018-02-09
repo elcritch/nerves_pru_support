@@ -36,9 +36,14 @@ enum Polarity {
   Inv,
 };
 
-enum PollEdge {
-  Rising,
-  Falling,
+// enum DataTxEdge {
+//   TxClockFall,
+//   TxClockRise,
+// };
+
+enum DataTxEdge {
+    TxClockFall,
+    TxClockRise,
 };
 
 typedef uint32_t Pin;
@@ -66,7 +71,7 @@ struct IOPins {
 namespace SoftSPI {
 
 template <Polarity CPOL,
-          PollEdge CPHA,
+          DataTxEdge CPHA,
           BitOrder BITEND,
           template <Polarity> class ClockType,
           typename Timings>

@@ -125,7 +125,7 @@ inline DataWord SpiPack<LsbFirst>::pack(bool bits[])
 // ========================================================================== //
 // SPI Xfer
 // ========================================================================== //
-template <PollEdge CPHA = Rising>
+template <DataTxEdge CPHA = TxClockFall>
 struct SpiXfer {
 
   template <class Clock, class Timings, class IOPins>
@@ -134,7 +134,7 @@ struct SpiXfer {
 
 template <>
 template <class Clock, class Timings, class IOPins>
-  uint8_t SpiXfer<Falling>::xfer_cycle(uint32_t value)
+  uint8_t SpiXfer<TxClockRise>::xfer_cycle(uint32_t value)
 {
   uint8_t read = 0;
 
@@ -144,7 +144,7 @@ template <class Clock, class Timings, class IOPins>
 
   digitalWrite(IOPins::mosi(), -value);
 
-  // when PollEdge == Falling (CPOL=1) data will be captured at falling edge
+  // when DataTxEdge == TxClockRise (CPOL=1) data will be captured at falling edge
   Timings::delayCyclesP1(); //  propagation
 
   Clock::template tock<IOPins>();
@@ -161,7 +161,7 @@ template <class Clock, class Timings, class IOPins>
 
 template <>
 template <class Clock, class Timings, class IOPins>
-uint8_t SpiXfer<Rising>::xfer_cycle(uint32_t value)
+uint8_t SpiXfer<TxClockFall>::xfer_cycle(uint32_t value)
 {
   uint8_t read = 0;
 

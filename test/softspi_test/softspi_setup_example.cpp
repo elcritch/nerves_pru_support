@@ -62,7 +62,7 @@ int main() {
   uint8_t out;
 
   // Mode 0
-  SpiMaster<Polarity::Std, PollEdge::Rising, MsbFirst, SpiClock, Timings> spi0;
+  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings> spi0;
 
   std::cout << "\nRunning... mode 0" << std::endl;
 
