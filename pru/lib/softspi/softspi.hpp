@@ -60,6 +60,7 @@ struct IOPins {
 #define WordSize(X) ( 8*sizeof(X) )
 
 #include "spi_helpers.hpp"
+#include "spi_xfer.hpp"
 
 // #ifndef NOOP
 // // __nop();

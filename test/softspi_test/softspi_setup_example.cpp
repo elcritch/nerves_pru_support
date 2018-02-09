@@ -59,12 +59,43 @@ typedef IOPins<10, 11, 14> SPIPins;
 // typedef SpiXfer<TxClockFall> Xfer;
 //typedef SpiXfer Xfer;
 
+template <DataTxEdge CPHA = TxClockFall>
+struct XSpiXfer {
+
+  template <class Clock, class Timings, class IOPins>
+  uint8_t xfer_cycle(uint32_t value)
+  {
+    uint8_t read = 0;
+
+
+    Clock::template tick<IOPins>();
+
+    Timings::delayCyclesP0();
+
+    digitalWrite(IOPins::mosi(), -value);
+
+    // when DataTxEdge == TxClockRise (CPOL=1) data will be captured at falling edge
+    Timings::delayCyclesP1(); //  propagation
+
+    Clock::template tock<IOPins>();
+
+    Timings::delayCyclesC0(); // holding low, so there is enough time for data preparation and changing
+
+    read = digitalRead(IOPins::miso()); // reading at the middle of SCK pulse
+
+    // wait until data is fetched by slave device,  while SCK low, checking DATAsheet for this interval
+    Timings::delayCyclesC1();
+
+    return read;
+  }
+};
+
 int main() {
 
   uint8_t out;
 
   // Mode 0
-  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings, SpiXfer> spi0;
+  SpiMaster<Polarity::Std, DataTxEdge::TxClockFall, MsbFirst, SpiClock, Timings, XSpiXfer> spi0;
 
   std::cout << "\nRunning... mode 0" << std::endl;
 
