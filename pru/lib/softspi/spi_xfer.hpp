@@ -4,8 +4,8 @@
 #ifndef _SOFTWARE_SPI_XFERS_H
 #define _SOFTWARE_SPI_XFERS_H
 
-#include <iostream>
-#include <bitset>
+// #include <iostream>
+// #include <bitset>
 
 namespace SoftSPI {
 
