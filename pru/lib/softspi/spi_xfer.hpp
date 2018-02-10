@@ -4,6 +4,8 @@
 #ifndef _SOFTWARE_SPI_XFERS_H
 #define _SOFTWARE_SPI_XFERS_H
 
+#include <iostream>
+#include <bitset>
 
 namespace SoftSPI {
 
@@ -92,7 +94,7 @@ namespace SoftSPI {
     // Clock::template tick<IOPins>();
     // Timings::delayCyclesP0();
     // digitalWrite(IOPins::mosi(), -value);
-    digitalWrite(IOPins::mosi() & IOPins::sck(), (-value & IOPins::mosi()) | (Clock::on() & IOPins::sck()) );
+    digitalWrite(IOPins::mosi() | IOPins::sck(), ((-value) & IOPins::mosi()) | (Clock::on() & IOPins::sck()) );
 
     // when DataTxEdge == TxClockRise (CPOL=1) data will be captured at falling edge
     Timings::delayCyclesP1(); //  propagation
@@ -116,7 +118,7 @@ namespace SoftSPI {
     // Clock::template tock<IOPins>();
     // Timings::delayCyclesP0(); // holding low, so there is enough time for data preparation and changing
     // digitalWrite(IOPins::mosi(), -value);
-    digitalWrite(IOPins::mosi() & IOPins::sck(), (-value & IOPins::mosi()) | (Clock::off() & IOPins::sck()) );
+    digitalWrite(IOPins::mosi() | IOPins::sck(), ((-value) & IOPins::mosi()) | (Clock::off() & IOPins::sck()) );
 
     // there is a requirement of LOW and HIGH have identical interval!
     Timings::delayCyclesP1();
