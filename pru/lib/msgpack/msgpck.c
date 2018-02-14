@@ -299,14 +299,20 @@ bool msgpck_read_integer(Stream * s, byte *b, uint8_t max_size) {
   if (stream_readBytes(s, &fb,1) != 1)
     return false;
   if(fb < 128) {
-    *b = fb;
+    /* b[0] = fb; */
+    b[max_size-1] = fb;
     read_size = 0;
     return true;
   } else if (fb >= 224) {
-    *b = fb;
+    /* b[0] = fb; */
+    b[max_size-1] = fb;
     read_size = 0;
     uint8_t i;
-    for(i = max_size-1; i >= 1; i--) {
+    /* for(i = max_size-1; i >= 1; i--) { */
+      /* b[i] = 0xff; */
+    /* } */
+    /* Little Endian (?) */
+    for(i = max_size-2; i >= 0; i--) {
       b[i] = 0xff;
     }
     return true;
