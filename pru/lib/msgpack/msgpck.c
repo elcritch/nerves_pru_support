@@ -327,10 +327,9 @@ bool msgpck_read_sint(Stream * s, byte *b, uint8_t max_size) {
     res &= stream_readBytes(s, &b[i],1);
   }
 
-  if(neg && ((b[read_size-1] >> 7) == 1)) {
-    for(i = max_size-1; i >= read_size; i--) {
-      b[i] = 0xff;
-    }
+  uint8_t prefix = (b[read_size-1] >> 7) == 1 ? 0xFF : 0x00;
+  for(i = max_size-1; i >= read_size; i--) {
+    b[i] = prefix;
   }
   return res;
 }
