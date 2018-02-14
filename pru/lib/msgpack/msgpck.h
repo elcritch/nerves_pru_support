@@ -261,7 +261,20 @@ bool msgpck_read_bool(Stream * s, bool *b);
  * return: true if next data has been read correctly, false if not
  *
 */
-bool msgpck_read_integer(Stream * s, byte *b, uint8_t max_size);
+bool msgpck_read_sint(Stream * s, byte *b, uint8_t max_size);
+
+/**
+  * Function: msgpck_read_integer
+  * Description: Read the first data of Stream s's buffer if it is an integer.
+  *
+  * Parameter: Stream * s : input stream.
+  *  byte * b: pointer to the read value.
+  *  uint8_t max_size: max size in byte of the expected value.
+  *
+  * return: true if next data has been read correctly, false if not
+  *
+  */
+bool msgpck_read_uint(Stream * s, byte *b, uint8_t max_size);
 
 /**
  * Function: msgpck_read_float

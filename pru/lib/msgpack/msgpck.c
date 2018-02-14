@@ -292,16 +292,13 @@ bool msgpck_read_bool(Stream * s, bool *b) {
   return ((dmp == 1) && ((rfb == 0xc3) || (rfb == 0xc2)));
 }
 
-bool msgpck_read_integer(Stream * s, byte *b, uint8_t max_size) {
+bool msgpck_read_sint(Stream * s, byte *b, uint8_t max_size) {
   byte fb;
   uint8_t read_size;
-  bool neg = false;
   if (stream_readBytes(s, &fb,1) != 1) {
     return false;
   } if(fb < 128) {
-    /* Little Endian (?) */
-    b[0] = fb;
-    return true;
+    return false;
   } else if (fb >= 224) {
     /* Little Endian (?) */
     b[0] = fb;
@@ -310,26 +307,14 @@ bool msgpck_read_integer(Stream * s, byte *b, uint8_t max_size) {
       b[i] = 0xff;
     }
     return true;
-  } else if (fb == 0xcc) {
-    read_size = 1;
-  } else if (fb == 0xcd) {
-    read_size = 2;
-  } else if (fb == 0xce) {
-    read_size = 4;
-  } else if (fb == 0xcf) {
-    read_size = 8;
   } else if (fb == 0xd0) {
     read_size = 1;
-     neg = true;
   } else if (fb == 0xd1) {
     read_size = 2;
-     neg = true;
   } else if (fb == 0xd2) {
     read_size = 4;
-     neg = true;
   } else if (fb == 0xd3) {
     read_size = 8;
-     neg = true;
   } else {
     return false;
   }
@@ -346,10 +331,46 @@ bool msgpck_read_integer(Stream * s, byte *b, uint8_t max_size) {
     for(i = max_size-1; i >= read_size; i--) {
       b[i] = 0xff;
     }
-  } else {
-    for(i = max_size-1; i >= read_size; i--) {
-      b[i] = 0x00;
+  }
+  return res;
+}
+
+bool msgpck_read_uint(Stream * s, byte *b, uint8_t max_size) {
+  byte fb;
+  uint8_t read_size;
+  if (stream_readBytes(s, &fb,1) != 1) {
+    return false;
+  } if(fb < 128) {
+    /* Little Endian (?) */
+    b[0] = fb;
+    for(i = max_size-1; i >= 1; i--) {
+      b[i] = 0x0;
     }
+    return true;
+  } else if (fb >= 224) {
+    return false;
+  } else if (fb == 0xcc) {
+    read_size = 1;
+  } else if (fb == 0xcd) {
+    read_size = 2;
+  } else if (fb == 0xce) {
+    read_size = 4;
+  } else if (fb == 0xcf) {
+    read_size = 8;
+  } else {
+    return false;
+  }
+  if(read_size > max_size)
+    return false;
+
+  bool res = true;
+  int8_t i;
+  for(i = read_size-1; i >= 0; i--) {
+    res &= stream_readBytes(s, &b[i],1);
+  }
+
+  for(i = max_size-1; i >= read_size; i--) {
+    b[i] = 0x00;
   }
   return res;
 }
