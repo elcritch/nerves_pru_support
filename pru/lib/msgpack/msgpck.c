@@ -303,7 +303,6 @@ bool msgpck_read_sint(Stream * s, byte *b, uint8_t max_size) {
     /* Little Endian (?) */
     b[0] = fb;
     int8_t i;
-    int8_t i;
     for(i = max_size-1; i >= 1; i--) {
       b[i] = 0xff;
     }
