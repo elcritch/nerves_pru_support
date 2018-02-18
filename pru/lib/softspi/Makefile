@@ -29,7 +29,7 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 PROJ_NAME=$(CURRENT_DIR)
 #-----------------------------------
-INCLUDE=--include_path=../../include
+INCLUDE=--include_path=../../include --include_path=../../include/am335x
 #-----------------------------------
 GEN_DIR=gen
 

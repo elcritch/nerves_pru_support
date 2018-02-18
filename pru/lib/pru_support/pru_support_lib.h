@@ -10,6 +10,9 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <pru_types.h>
+#include <pru_cfg.h>
+#include <pru_intc.h>
+
 
 /*
  * - [AM335x PRU Read Latencies](http://processors.wiki.ti.com/index.php/AM335x_PRU_Read_Latencies)
@@ -111,8 +114,66 @@ inline void digitalToggle(uint32_t gpio_bitmask) {
 
 #endif
 
+inline void kickInterrupt(uint32_t interrupt_id) {
+  __R31 = ((uint32_t)interrupt_id - 16) | (1<<5);
+}
+
+/* #define INTERRUPT_TO_MASK(N) (1 << (16+N)) */
+
+inline bool kickSystemCheck(uint32_t interrupt_id) {
+  return (__R31 & (1 << interrupt_id)); // read mask bit as interrupt
+}
+
+inline bool kickCheck(uint32_t interrupt_id) {
+  return CT_INTC.SRSR0 & ((uint32_t)1 << interrupt_id); // read mask bit as interrupt
+}
+
+inline void kickClear(uint8_t interrupt_id) {
+  CT_INTC.SECR0 = ((uint32_t)1 << interrupt_id); // set mask bit to 1 to clear
+}
+
+inline void kickClearAll() {
+  CT_INTC.SECR0 = (uint32_t)(-1);
+}
+
+
+inline int kickCheckAny(const uint8_t interrupt_ids[], uint8_t num_ints) {
+  uint8_t idx;
+  for (idx = 0; idx < num_ints; ++idx) {
+    if (kickCheck(interrupt_ids[idx]))
+      return idx;
+  }
+  return -1;
+}
+
+inline bool kickReceived(uint8_t interrupt_id) {
+  if (kickCheck(interrupt_id)) {
+    kickClear(interrupt_id);
+    return true;
+  }
+  else {
+    return true;
+  }
+}
+
 #ifdef __cplusplus
 }
+#endif
+#define MAX_KICK_WT_CYCLES 4
+
+
+#ifdef __cplusplus
+template<typename T, typename S>
+  void unsafe_shared_mem_xfer(volatile T *vtgt, volatile S *vsrc, uint32_t sz) {
+  __builtin_memcpy( const_cast<T*>(vtgt), const_cast<S*>(vsrc), sz);
+}
+
+template<typename T, typename S>
+  void unsafe_shared_mem_xfer(volatile T **vtgt, volatile S *vsrc, uint32_t sz) { return "error";}
+template<typename T, typename S>
+  void unsafe_shared_mem_xfer(volatile T *vtgt, volatile S **vsrc, uint32_t sz) { return "error";}
+template<typename T, typename S>
+  void unsafe_shared_mem_xfer(volatile T **vtgt, volatile S **vsrc, uint32_t sz) { return "error";}
 #endif
 
 #endif
