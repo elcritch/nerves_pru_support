@@ -164,7 +164,7 @@ inline bool kickReceived(uint8_t interrupt_id) {
 
 #ifdef __cplusplus
 template<typename T, typename S>
-  void unsafe_shared_mem_xfer(volatile T *vtgt, volatile S *vsrc, uint32_t sz) {
+  inline void unsafe_shared_mem_xfer(volatile T *vtgt, volatile S *vsrc, uint32_t sz) {
   __builtin_memcpy( const_cast<T*>(vtgt), const_cast<S*>(vsrc), sz);
 }
 
