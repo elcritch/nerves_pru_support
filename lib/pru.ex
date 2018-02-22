@@ -142,5 +142,6 @@ defmodule Pru do
 
   def run(cmd) do
     IO.puts(:os.cmd(cmd |> to_charlist))
+    :os.timestamp()
   end
 end
