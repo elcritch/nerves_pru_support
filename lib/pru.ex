@@ -139,4 +139,8 @@ defmodule Pru do
     :os.cmd('config-pin #{pin} pruin')
     {:ok}
   end
+
+  def run(cmd) do
+    IO.puts(:os.cmd(cmd |> to_string))
+  end
 end
