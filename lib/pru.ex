@@ -141,6 +141,6 @@ defmodule Pru do
   end
 
   def run(cmd) do
-    IO.puts(:os.cmd(cmd |> to_string))
+    IO.puts(:os.cmd(cmd |> to_charlist))
   end
 end
