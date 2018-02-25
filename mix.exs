@@ -19,12 +19,13 @@ defmodule Pru.Mixfile do
       make_clean: ["clean"],
       start_permanent: Mix.env() == :prod,
       package: package(),
-      #  aliases:  [
-      #   "deps.get": ["deps.get", "nerves.deps.get"],
-      #   "compile": ["nerves.env", "compile"],
-      #   "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"]
-      # ],
-      # aliases: [loadconfig: [&bootstrap/1]],
+       aliases:  [
+        # "deps.get": ["deps.get", "nerves.deps.get"],
+        # "compile": ["nerves.env", "compile"],
+        # "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"],
+        loadconfig: [&bootstrap/1],
+      ],
+      aliases: [loadconfig: [&bootstrap/1]],
 
       deps: deps()
     ]
