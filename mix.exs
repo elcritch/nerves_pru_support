@@ -9,7 +9,7 @@ defmodule Pru.Mixfile do
       description:
         "Basic library that enables easy interaction with the PRU cores present in the BeagleBone Black.",
       app: @app,
-      version: "0.4.0",
+      version: "0.4.1",
       nerves_package: nerves_package(),
       # archives: [nerves_bootstrap: "~> 0.6"],
       elixir: "~> 1.5",
@@ -54,6 +54,9 @@ defmodule Pru.Mixfile do
       platform_config: [
       ],
       target_tuple: :arm_unknown_linux_gnueabihf,
+      artifact_sites: [
+        {:github_releases, "elcritch/#{@app}"}
+      ],
     ]
   end
 
