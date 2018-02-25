@@ -48,10 +48,8 @@ defmodule Pru.Mixfile do
       toolchain_extras: [
         env_var: "PRU_LIB",
         build_link_path: "",
-        boostrap_override: fn pkg ->
-          IO.puts "BOOTSTRAP:pru_support"
-          System.put_env("PRU_LIB", pkg.path <> "/priv" )
-        end,
+        clean_files: ["priv"],
+        archive_script: "scripts/archive.sh",
       ],
       platform_config: [
       ],
