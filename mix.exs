@@ -11,7 +11,7 @@ defmodule Pru.Mixfile do
       app: @app,
       version: "0.4.0",
       nerves_package: nerves_package(),
-      archives: [nerves_bootstrap: "~> 0.6"],
+      # archives: [nerves_bootstrap: "~> 0.6"],
       elixir: "~> 1.5",
       compilers: [:elixir_make, :nerves_package] ++ Mix.compilers(),
       make_clean: ["clean"],
@@ -80,6 +80,7 @@ defmodule Pru.Mixfile do
   end
 
   defp bootstrap(args) do
+    IO.puts "BOOTSTRAP: PRU_LIB"
     Application.start(:nerves_bootstrap)
     Mix.Task.run("loadconfig", args)
   end
