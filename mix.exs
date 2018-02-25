@@ -15,7 +15,7 @@ defmodule Pru.Mixfile do
       elixir: "~> 1.5",
       # compilers: [:elixir_make, :nerves_package] ++ Mix.compilers(),
       # compilers: [:elixir_make ] ++ Mix.compilers(),
-      compilers: Mix.compilers(),
+      compilers: [:nerves_package] ++ Mix.compilers(),
       make_clean: ["clean"],
       start_permanent: Mix.env() == :prod,
       package: package(),
