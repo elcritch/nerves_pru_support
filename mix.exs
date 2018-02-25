@@ -9,19 +9,21 @@ defmodule Pru.Mixfile do
       description:
         "Basic library that enables easy interaction with the PRU cores present in the BeagleBone Black.",
       app: @app,
+      version: "0.4.0",
       nerves_package: nerves_package(),
       archives: [nerves_bootstrap: "~> 0.6"],
-      version: "0.3.0",
       elixir: "~> 1.5",
       compilers: [:elixir_make] ++ Mix.compilers(),
       make_clean: ["clean"],
       start_permanent: Mix.env() == :prod,
       package: package(),
-       aliases:  [
-        "deps.get": ["deps.get", "nerves.deps.get"],
-        "compile": ["nerves.env", "compile"],
-        "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"]
-      ],
+      #  aliases:  [
+      #   "deps.get": ["deps.get", "nerves.deps.get"],
+      #   "compile": ["nerves.env", "compile"],
+      #   "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"]
+      # ],
+      aliases: [loadconfig: [&bootstrap/1]],
+
       deps: deps()
     ]
   end
@@ -73,5 +75,11 @@ defmodule Pru.Mixfile do
   def aliases() do
     [] |> Nerves.Bootstrap.add_aliases()
   end
+
+  defp bootstrap(args) do
+    Application.start(:nerves_bootstrap)
+    Mix.Task.run("loadconfig", args)
+  end
+
 
 end
