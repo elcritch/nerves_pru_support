@@ -13,7 +13,7 @@ defmodule Pru.Mixfile do
       nerves_package: nerves_package(),
       archives: [nerves_bootstrap: "~> 0.6"],
       elixir: "~> 1.5",
-      compilers: [:elixir_make] ++ Mix.compilers(),
+      compilers: [:elixir_make, :nerves_package] ++ Mix.compilers(),
       make_clean: ["clean"],
       start_permanent: Mix.env() == :prod,
       package: package(),
