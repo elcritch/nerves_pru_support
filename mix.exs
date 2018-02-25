@@ -42,7 +42,7 @@ defmodule Pru.Mixfile do
       app: @app,
       name: @app,
       type: :extras_toolchain_support,
-      platform: Nerves.System.ToolchainExtras,
+      platform: NervesExtras.Toolchain,
       toolchain_extras: [
         env_var: "PRU_LIB",
         build_link_path: "",
