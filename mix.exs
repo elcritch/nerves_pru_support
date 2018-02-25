@@ -13,18 +13,18 @@ defmodule Pru.Mixfile do
       nerves_package: nerves_package(),
       # archives: [nerves_bootstrap: "~> 0.6"],
       elixir: "~> 1.5",
-      compilers: [:elixir_make, :nerves_package] ++ Mix.compilers(),
+      # compilers: [:nerves_package, :elixir_make, ] ++ Mix.compilers(),
       # compilers: [:elixir_make ] ++ Mix.compilers(),
-      # compilers: [:nerves_package] ++ Mix.compilers(),
+      compilers: [:nerves_package] ++ Mix.compilers(),
       make_clean: ["clean"],
       start_permanent: Mix.env() == :prod,
       package: package(),
-       aliases:  [
-        # "deps.get": ["deps.get", "nerves.deps.get"],
-        # "compile": ["nerves.env", "compile"],
-        # "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"],
-        loadconfig: [&bootstrap/1],
-      ],
+      #  aliases:  [
+      #   # "deps.get": ["deps.get", "nerves.deps.get"],
+      #   # "compile": ["nerves.env", "compile"],
+      #   # "deps.loadpaths": ["nerves.loadpaths", "deps.loadpaths"],
+      #   loadconfig: [&bootstrap/1],
+      # ],
       aliases: [loadconfig: [&bootstrap/1]],
 
       deps: deps()
@@ -42,9 +42,8 @@ defmodule Pru.Mixfile do
 
   def nerves_package do
     [
-      app: @app,
       name: @app,
-      type: :extras_toolchain_support,
+      type: :extras_toolchain,
       platform: NervesExtras.Toolchain,
       toolchain_extras: [
         env_var: "PRU_LIB",
@@ -66,7 +65,8 @@ defmodule Pru.Mixfile do
       {:ex_doc, ">= 0.0.0", only: :dev},
       {:elixir_make, "~> 0.4.0", runtime: false},
       {:toolchain_extras, "~> 0.1", github: "elcritch/toolchain_extras", runtime: false},
-      {:toolchain_extras_pru_cgt, "~> 2.2",
+
+      {:toolchain_extras_pru_cgt, "~> 2.2.1",
        github: "elcritch/extras_toolchain_pru_cgt",
        branch: "v1.0.0rc"},
     ]

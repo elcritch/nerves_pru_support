@@ -5,8 +5,6 @@ ifeq ($(MIX_ENV),test)
 SUBDIRS += $(TEST_BUDIRS)
 endif
 
-#export PRU_CGT=$(shell mix nerves.path.artifact extras_toolchain_pru_cgt)/ti-cgt-pru
-
 all: $(SUBDIRS)
 
 test: $(TEST_SUBDIRS)

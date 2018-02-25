@@ -28,3 +28,6 @@ elixir_ale-*.tar
 *.lib
 gen/
 .#*
+
+.nerves
+*.tar.*
