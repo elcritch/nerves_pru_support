@@ -9,7 +9,7 @@ defmodule Pru.Mixfile do
       description:
         "Basic library that enables easy interaction with the PRU cores present in the BeagleBone Black.",
       app: @app,
-      version: "0.5.0",
+      version: "0.5.1",
       nerves_package: nerves_package(),
       # archives: [nerves_bootstrap: "~> 0.6"],
       elixir: "~> 1.5",
@@ -57,6 +57,7 @@ defmodule Pru.Mixfile do
       artifact_sites: [
         {:github_releases, "elcritch/#{@app}"}
       ],
+      checksum: package_files(),
     ]
   end
 
@@ -76,9 +77,21 @@ defmodule Pru.Mixfile do
   defp package do
     [
       maintainers: ["Mikel Cranfill", "Jaremy Creechley"],
-      files: ["lib", "LICENSE", "mix.exs", "README.md"],
+      files: package_files(),
       licenses: ["MIT"],
       links: %{"Github" => "https://github.com/elcritch/pru"}
+    ]
+  end
+
+  defp package_files do
+    [
+      "LICENSE",
+      "mix.exs",
+      "README.md",
+      "VERSION",
+      "scripts",
+      "src",
+      "pru",
     ]
   end
 
