@@ -85,13 +85,11 @@ defmodule Pru.Mixfile do
 
   defp package_files do
     [
+      "Makefile",
       "LICENSE",
       "mix.exs",
       "README.md",
-      "VERSION",
       "scripts",
-      "src",
-      "pru",
       "pru/lib/pru_support/pru_support_lib.h",
       "ru/lib/pru_support/pru_support_pins.h",
       "pru/lib/pru_support/pru_support_lib.c",
