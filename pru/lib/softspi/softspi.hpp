@@ -95,7 +95,28 @@ struct SpiMaster {
   inline void unselect(Pin cs) { digitalWrite(cs, HIGH); }
 
   template<typename DataWord, class IOPins>
-  DataWord transfer(Pin cs, DataWord b) {
+  DataWord transfer(Pin CS, DataWord data) {
+    select(CS);
+    DataWord result = transfer<DataWord, WordSize(DataWord), IOPins>(data);
+    unselect(CS);
+    return result;
+  }
+
+  template<typename DataWord, uint8_t bit_count, class IOPins>
+  DataWord transfer(Pin CS, DataWord data) {
+    select(CS);
+    DataWord result =transfer<DataWord, bit_count, IOPins>(data);
+    unselect(CS);
+    return result;
+  }
+
+  template<typename DataWord, class IOPins>
+  DataWord transfer( DataWord data) {
+    return transfer<DataWord, WordSize(DataWord), IOPins>();
+  }
+
+  template<typename DataWord, uint8_t bit_count, class IOPins>
+  DataWord transfer( DataWord data) {
 
     bool bits[WordSize(DataWord)];
     this->__xfers++;
@@ -106,25 +127,23 @@ struct SpiMaster {
     Clock::template tock<IOPins>();
 
     // Here, delay is added, to make CPHA=1 and CPHA=0 both work!
-    Timings::delayCycles();
-    select(cs);
+    Timings::delayCyclesPre();
 
     // Check that your compiler unroll's this properly!
 
     uint8_t idx;
-    for (idx = 0; idx < WordSize(DataWord); idx++) {
-      DataWord bit = packer.mask(b, idx, WordSize(DataWord));
+    for (idx = 0; idx < bit_count; idx++) {
+      DataWord bit = packer.template mask<DataWord, bit_count>(data, idx);
       bits[idx] = xfer.template xfer_cycle<Clock, Timings, IOPins>(bit);
     }
 
-    unselect(cs);
     digitalWrite(IOPins::mosi(), LOW);
 
-    Timings::delayCycles(); // checking timing characteristics, it is no
+    Timings::delayCyclesPost(); // checking timing characteristics, it is no
 
     // needed by AD7730, from CS to rising edge
 
-    return packer.template pack<DataWord>(bits);
+    return packer.template pack<DataWord, bit_count>(bits);
   }
 };
 

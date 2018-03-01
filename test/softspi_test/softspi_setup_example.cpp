@@ -54,7 +54,7 @@ struct ClockDelay {
   }
 };
 
-typedef ClockTimings<10,5,0,5,0, ClockDelay> Timings;
+typedef ClockTimings<10,5,0,5,0, 10, ClockDelay> Timings;
 typedef IOPins<10, 11, 14> SPIPins;
 // typedef SpiXfer<TxClockFall> Xfer;
 //typedef SpiXfer Xfer;

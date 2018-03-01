@@ -2,12 +2,12 @@ MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
 CURRENT_DIR := $(notdir $(patsubst %/,%,$(dir $(MKFILE_PATH))))
 PROJ_NAME=$(CURRENT_DIR)
 #-----------------------------------
-INCLUDE=-I../../pru/include -I../../pru/lib/softspi
+INCLUDE=-I../../pru/include -I../../pru/include/am335x -I../../pru/lib/softspi
 #-----------------------------------
 LIB_DIR=../../pru/lib/softspi/
 
 CXX=clang++ # gcc 7.2 seems to break currently on the transfer loop where sizeof(...) is used. 
-CFLAGS= -O3 -g  -std=c++11  -DPRU_SUPPORT_OVERRIDE_R30 -DPRU_SUPPORT_OVERRIDE_R31
+CFLAGS= -O3 -g  -std=c++11 -DTEST_BUILD -DPRU_SUPPORT_OVERRIDE_R30 -DPRU_SUPPORT_OVERRIDE_R31
 
 SOURCES=$(wildcard *.cpp)
 #Using .object instead of .obj in order to not conflict with the CCS build process

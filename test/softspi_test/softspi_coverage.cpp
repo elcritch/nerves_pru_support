@@ -190,7 +190,7 @@ struct ClockDelay {
   }
 };
 
-typedef ClockTimings<7,0,5,0,5, ClockDelay> Timings;
+typedef ClockTimings<7,0,5,0,5, 7, ClockDelay> Timings;
 
 int main() {
 

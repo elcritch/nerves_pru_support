@@ -11,19 +11,21 @@
 
 namespace SoftSPI {
 
-template<uint32_t sck_cycle,
+template<uint32_t sck_pre,
           uint32_t prop_pre,
           uint32_t prop_post,
           uint32_t capt_pre,
           uint32_t capt_post,
+         uint32_t sck_post,
          template<uint32_t d> class DelayImpl>
 struct ClockTimings {
 
-  static inline void delayCycles() { DelayImpl<sck_cycle>()(); }
+  static inline void delayCyclesPre() { DelayImpl<sck_pre>()(); }
   static inline void delayCyclesP0() { DelayImpl<prop_pre>()(); }
   static inline void delayCyclesP1() { DelayImpl<prop_post>()(); }
   static inline void delayCyclesC0() { DelayImpl<capt_pre>()(); }
   static inline void delayCyclesC1() { DelayImpl<capt_post>()(); }
+  static inline void delayCyclesPost() { DelayImpl<sck_post>()(); }
 };
 
 
@@ -93,40 +95,43 @@ template<> uint32_t SpiClock<Std>::off() { return LOW; }
 // ========================================================================== //
 template <BitOrder BITEND>
 struct SpiPack {
-  inline bool mask(uint8_t byte, uint8_t idx, const uint32_t word_size);
-  template<typename DataWord>
+  template<typename DataWord, uint8_t bit_count>
+  inline bool mask(DataWord byte, uint8_t idx);
+  template<typename DataWord, uint8_t bit_count>
   inline DataWord pack(bool bits[]);
 };
 
 template<>
-inline bool SpiPack<MsbFirst>::mask(uint8_t byte, uint8_t idx, const uint32_t word_size) {
-  return !!( (16*word_size >> idx) & byte);
+template<typename DataWord, uint8_t bit_count>
+inline bool SpiPack<MsbFirst>::mask(DataWord data, uint8_t idx) {
+  return !!( (1 << (bit_count - idx - 1)) & data);
 }
 
 template<>
-inline bool SpiPack<LsbFirst>::mask(uint8_t byte, uint8_t idx, const uint32_t word_size) {
-  return !!( (1 << idx) & byte);
+template<typename DataWord, uint8_t bit_count>
+inline bool SpiPack<LsbFirst>::mask(DataWord data, uint8_t idx) {
+  return !!( (1 << idx) & data);
 }
 
 template<>
-template<typename DataWord>
+template<typename DataWord, uint8_t bit_count>
 inline DataWord SpiPack<MsbFirst>::pack(bool bits[])
 {
   uint8_t i;
   DataWord word = 0;
-  for (i = 0; i < WordSize(DataWord); i++) {
-    word |= bits[i] << (WordSize(DataWord) - i - 1);
+  for (i = 0; i < bit_count; i++) {
+    word |= bits[i] << (bit_count - i - 1);
   }
   return word;
 }
 
 template<>
-template<typename DataWord>
+template<typename DataWord, uint8_t bit_count>
 inline DataWord SpiPack<LsbFirst>::pack(bool bits[])
 {
   uint8_t i;
   DataWord word = 0;
-  for (i = 0; i < WordSize(DataWord); i++) {
+  for (i = 0; i < bit_count; i++) {
     word |= bits[i] << i;
   }
   return word;

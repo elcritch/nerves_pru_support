@@ -9,9 +9,22 @@ extern "C" {
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#ifndef TEST_BUILD
 #include <pru_types.h>
 #include <pru_cfg.h>
 #include <pru_intc.h>
+#else
+
+#define __far 
+#define __attribute__(N) 
+
+#include <pru_types.h>
+#include <pru_cfg.h>
+#include <pru_intc.h>
+/* volatile uint32_t __R31; */
+
+#endif
 
 
 /*
@@ -169,11 +182,11 @@ template<typename T, typename S>
 }
 
 template<typename T, typename S>
-  void unsafe_shared_mem_xfer(volatile T **vtgt, volatile S *vsrc, uint32_t sz) { return "error";}
+  void unsafe_shared_mem_xfer(volatile T **vtgt, volatile S *vsrc, uint32_t sz);
 template<typename T, typename S>
-  void unsafe_shared_mem_xfer(volatile T *vtgt, volatile S **vsrc, uint32_t sz) { return "error";}
+  void unsafe_shared_mem_xfer(volatile T *vtgt, volatile S **vsrc, uint32_t sz);
 template<typename T, typename S>
-  void unsafe_shared_mem_xfer(volatile T **vtgt, volatile S **vsrc, uint32_t sz) { return "error";}
+  void unsafe_shared_mem_xfer(volatile T **vtgt, volatile S **vsrc, uint32_t sz);
 #endif
 
 #endif
