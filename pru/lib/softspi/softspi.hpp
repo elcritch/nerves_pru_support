@@ -112,7 +112,7 @@ struct SpiMaster {
 
   template<typename DataWord, class IOPins>
   DataWord transfer( DataWord data) {
-    return transfer<DataWord, WordSize(DataWord), IOPins>();
+    return transfer<DataWord, WordSize(DataWord), IOPins>(data);
   }
 
   template<typename DataWord, uint8_t bit_count, class IOPins>

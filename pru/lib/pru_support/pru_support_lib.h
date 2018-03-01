@@ -22,6 +22,7 @@ extern "C" {
 #include <pru_types.h>
 #include <pru_cfg.h>
 #include <pru_intc.h>
+
 /* volatile uint32_t __R31; */
 
 #endif

@@ -21,6 +21,9 @@ void digitalWrite(uint32_t gpio_bitmask, uint32_t state);
 bool digitalRead(uint32_t gpio_bitmask);
 void digitalToggle(uint32_t gpio_bitmask);
 
+volatile uint32_t __R30;
+volatile uint32_t __R31;
+
 #include <softspi.hpp>
 
 using namespace SoftSPI;
