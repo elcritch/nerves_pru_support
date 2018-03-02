@@ -9,27 +9,34 @@ defmodule Pru.Port do
 
   defmodule State do
     @moduledoc false
-    defstruct port: nil, pin: 0, encoder: nil, decoder: nil, callbacks: []
+    defstruct port: nil, channel: 0, encoder: nil, decoder: nil, callbacks: []
   end
 
   @options [:encoder, :decoder]
+  def pid_name(channel), do: String.to_atom("#{__MODULE__}.Ch#{channel}")
 
-  # @type pin_direction :: :input | :output
+
+  def whereis(channel) do
+    Process.whereis(pid_name(channeld))
+  end
+  # @type channel_direction :: :input | :output
 
   # Public API
   @doc """
   """
   @spec start_link(integer, [term]) :: {:ok, pid}
-  def start_link(pin, opts \\ []) do
+  def start_link(channel, opts \\ []) do
+    name = pid_name(channel)
+    Logger.info "#{__MODULE__}: process name #{pid_name}"
     GenServer.start_link(
       __MODULE__,
-      [pin, Keyword.take(opts, @options)],
-      Keyword.drop(opts, @options) ++ [name: String.to_atom("#{__MODULE__}.Pin#{pin}")]
+      [channel, Keyword.take(opts, @options)],
+      Keyword.drop(opts, @options) ++ [name: name]
     )
   end
 
   @doc """
-  Free the resources associated with pin and stop the GenServer.
+  Free the resources associated with channel and stop the GenServer.
   """
   @spec release(pid) :: :ok
   def release(pid) do
@@ -48,7 +55,7 @@ defmodule Pru.Port do
   end
 
   @doc """
-  Read the current value of the pin.
+  Read the current value of the channel.
   """
   @spec read(pid) :: 0 | 1 | {:error, term}
   def read(pid) do
@@ -56,7 +63,7 @@ defmodule Pru.Port do
   end
 
   @doc """
-  Turn on "interrupts" on the input pin. The pin can be monitored for
+  Turn on "interrupts" on the input channel. The channel can be monitored for
   `:rising` transitions, `:falling` transitions, or `:both`. The process
   that calls this method will receive the messages.
   """
@@ -65,14 +72,19 @@ defmodule Pru.Port do
     GenServer.cast(pid, {:register, self()})
   end
 
+  @spec shutdown(pid) :: :ok | {:error, term}
+  def register(pid) do
+    GenServer.call(pid, {:close, self()})
+  end
+
   # gen_server callbacks
-  def init([pin, msgopts]) do
-    Logger.info("Pru.Port init - pin: #{inspect(pin)} ")
+  def init([channel, msgopts]) do
+    Logger.info("Pru.Port init - channel: #{inspect(channel)} ")
     executable = :code.priv_dir(:nerves_pru_support) ++ '/pru_msg'
 
     port =
       Port.open({:spawn_executable, executable}, [
-        {:args, ["pru", "#{pin}"]},
+        {:args, ["pru", "#{channel}"]},
         {:packet, 2},
         :use_stdio,
         :binary,
@@ -82,7 +94,7 @@ defmodule Pru.Port do
     encoder = msgopts[:encoder] || fn x -> x end
     decoder = msgopts[:decoder] || fn x -> x end
 
-    state = %State{port: port, pin: pin, encoder: encoder, decoder: decoder, callbacks: []}
+    state = %State{port: port, channel: channel, encoder: encoder, decoder: decoder, callbacks: []}
     {:ok, state}
   end
 
@@ -94,6 +106,10 @@ defmodule Pru.Port do
   def handle_call({:write, value}, _from, state) do
     {:ok, response} = call_port(state, :write, state.encoder.(value))
     {:reply, response, state}
+  end
+
+  def handle_call({:close, pid}, _from, %{port: port}) do
+    {:stop, :normal, Port.close(port), state}
   end
 
   def handle_cast(:release, state) do
@@ -129,8 +145,8 @@ defmodule Pru.Port do
   end
 
   defp handle_port({:read, value}, state) do
-    Logger.debug("Received message from PRU #{state.pin}: #{value}")
-    msg = {:pru_rx_msg, state.pin, state.decoder.(value)}
+    Logger.debug("Received message from PRU #{state.channel}: #{value}")
+    msg = {:pru_rx_msg, state.channel, state.decoder.(value)}
 
     for pid <- state.callbacks do
       send(pid, msg)
