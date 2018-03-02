@@ -29,7 +29,5 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
-
 # config :nerves, :firmware,
-  # rootfs_overlay: "rootfs_overlay"
-
+# rootfs_overlay: "rootfs_overlay"

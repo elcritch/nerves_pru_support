@@ -15,10 +15,10 @@ defmodule Pru.Port do
   @options [:encoder, :decoder]
   def pid_name(channel), do: String.to_atom("#{__MODULE__}.Ch#{channel}")
 
-
   def whereis(channel) do
-    Process.whereis(pid_name(channeld))
+    Process.whereis(pid_name(channel))
   end
+
   # @type channel_direction :: :input | :output
 
   # Public API
@@ -27,7 +27,8 @@ defmodule Pru.Port do
   @spec start_link(integer, [term]) :: {:ok, pid}
   def start_link(channel, opts \\ []) do
     name = pid_name(channel)
-    Logger.info "#{__MODULE__}: process name #{pid_name}"
+    Logger.info("#{__MODULE__}: process name #{name}")
+
     GenServer.start_link(
       __MODULE__,
       [channel, Keyword.take(opts, @options)],
@@ -73,7 +74,7 @@ defmodule Pru.Port do
   end
 
   @spec shutdown(pid) :: :ok | {:error, term}
-  def register(pid) do
+  def shutdown(pid) do
     GenServer.call(pid, {:close, self()})
   end
 
@@ -94,7 +95,14 @@ defmodule Pru.Port do
     encoder = msgopts[:encoder] || fn x -> x end
     decoder = msgopts[:decoder] || fn x -> x end
 
-    state = %State{port: port, channel: channel, encoder: encoder, decoder: decoder, callbacks: []}
+    state = %State{
+      port: port,
+      channel: channel,
+      encoder: encoder,
+      decoder: decoder,
+      callbacks: []
+    }
+
     {:ok, state}
   end
 
@@ -108,8 +116,8 @@ defmodule Pru.Port do
     {:reply, response, state}
   end
 
-  def handle_call({:close, pid}, _from, %{port: port}) do
-    {:stop, :normal, Port.close(port), state}
+  def handle_call({:close, pid}, _from, state) do
+    {:stop, :normal, Port.close(state.port), state}
   end
 
   def handle_cast(:release, state) do
