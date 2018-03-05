@@ -121,7 +121,7 @@ defmodule Pru.Mixfile do
   end
 
   defp package_files(:mix) do
-    package_files() ++
+    base_files() ++
     [
       "src/erlcmd.h",
       "src/Makefile",
@@ -132,7 +132,7 @@ defmodule Pru.Mixfile do
   end
 
   defp package_files(:nerves) do
-    package_files() ++ artifact_files()
+    base_files() ++ artifact_files()
   end
 
   def aliases() do
