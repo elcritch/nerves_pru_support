@@ -41,7 +41,7 @@ ERL_LDFLAGS ?= -L$(ERL_EI_LIBDIR) -lei
 
 LDFLAGS +=
 CFLAGS ?= -O2 -Wall -Wextra -Wno-unused-parameter
-CC ?= $(CROSSCOMPILE)-gcc
+# CC ?= $(CROSSCOMPILE)-gcc
 
 SRC=$(wildcard *.c)
 OBJ=$(SRC:.c=.o)
