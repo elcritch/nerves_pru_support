@@ -3,6 +3,10 @@ defmodule Pru do
   BeagleBone Black/Green PRU Helper Library
   """
 
+  # Sysfs location from kernel 4.9
+  @sysfs_pru0 "/sys/class/remoteproc/remoteproc1"
+  @sysfs_pru1 "/sys/class/remoteproc/remoteproc2"
+
   @doc """
   Loads the cape-universal and cape-univ-hdmi to maximize
   the number of available pins since HDMI is disabled
@@ -53,11 +57,13 @@ defmodule Pru do
   def boot(pru) do
     case pru do
       0 ->
-        :os.cmd('echo "4a334000.pru0" > /sys/bus/platform/drivers/pru-rproc/bind')
+        run "echo 'am335x-pru0-fw' > #{sysfs_pru0}/firmware"
+        run "echo 'start' > #{sysfs_pru0}/state"
         {:ok}
 
       1 ->
-        :os.cmd('echo "4a338000.pru1" > /sys/bus/platform/drivers/pru-rproc/bind')
+        run "echo 'am335x-pru1-fw' > #{sysfs_pru1}/firmware"
+        run "echo 'start' > #{sysfs_pru1}/state"
         {:ok}
 
       _ ->
@@ -79,11 +85,11 @@ defmodule Pru do
   def halt(pru) do
     case pru do
       0 ->
-        :os.cmd('echo "4a334000.pru0" > /sys/bus/platform/drivers/pru-rproc/unbind')
+        run "echo 'start' > #{sysfs_pru0}/state"
         {:ok}
 
       1 ->
-        :os.cmd('echo "4a338000.pru1" > /sys/bus/platform/drivers/pru-rproc/unbind')
+        run "echo 'start' > #{sysfs_pru1}/state"
         {:ok}
 
       _ ->
