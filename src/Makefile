@@ -54,6 +54,7 @@ all: $(DEFAULT_TARGETS)
 	$(CC) -c $(ERL_CFLAGS) $(CFLAGS) -o $@ $<
 
 ../priv/pru_msg: $(OBJ)
+	echo "CC:" $(CC)
 	$(CC) $^ $(ERL_LDFLAGS) $(LDFLAGS) -o $@
 
 clean:
