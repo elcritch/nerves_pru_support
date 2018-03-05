@@ -47,7 +47,7 @@ defmodule Pru.Mixfile do
       artifact_sites: [
         {:github_releases, "elcritch/#{@app}"}
       ],
-      checksum: package_files()
+      checksum: package_files(:nerves)
     ]
   end
 
@@ -65,18 +65,14 @@ defmodule Pru.Mixfile do
   defp package do
     [
       maintainers: ["Mikel Cranfill", "Jaremy Creechley"],
-      files: package_files(),
+      files: package_files(:mix),
       licenses: ["MIT"],
       links: %{"Github" => "https://github.com/elcritch/pru"}
     ]
   end
 
-  defp package_files do
+  defp artifact_files() do
     [
-      "Makefile",
-      "LICENSE",
-      "mix.exs",
-      "README.md",
       "scripts",
       "pru/lib/pru_support/pru_support_lib.h",
       "pru/lib/pru_support/pru_support_pins.h",
@@ -112,12 +108,31 @@ defmodule Pru.Mixfile do
       "pru/include/pru_virtio_ids.h",
       "pru/include/pru_virtio_ring.h",
       "pru/include/rsc_types.h",
+    ]
+  end
+
+  defp base_files() do
+    [
+      "Makefile",
+      "LICENSE",
+      "mix.exs",
+      "README.md",
+    ]
+  end
+
+  defp package_files(:mix) do
+    package_files() ++
+    [
       "src/erlcmd.h",
       "src/Makefile",
       "src/pru_main.c",
       "src/linux/i2c-dev.h",
       "src/erlcmd.c"
     ]
+  end
+
+  defp package_files(:nerves) do
+    package_files() ++ artifact_files()
   end
 
   def aliases() do
