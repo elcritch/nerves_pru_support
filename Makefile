@@ -11,6 +11,7 @@ endif
 all: $(SRCDIRS)
 
 $(SRCDIRS):
+	echo srcdirs: $@
 	$(MAKE) -C $@
 
 artifact: $(SUBDIRS)
@@ -32,6 +33,7 @@ $(TEST_SUBDIRS): artifact_build
 	$(MAKE) -C $@
 
 clean: clean_artifact
+	$(eval export PRU_CGT := "/dev/null")
 	@for d in $(SUBDIRS); do (cd $$d; $(MAKE) clean ); done
 	@for d in $(TEST_SUBDIRS); do (cd $$d; $(MAKE) clean ); done
 
