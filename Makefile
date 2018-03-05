@@ -2,7 +2,7 @@ SRCDIRS = src
 SUBDIRS = pru/lib/rpmsg pru/lib/pru_support pru/lib/msgpack pru/lib/softspi
 TEST_SUBDIRS = test/softspi_test
 
-ARTIFACT_DIR = _build/pru
+export ARTIFACT_DIR = _build/pru
 
 ifeq ($(MIX_ENV),test)
 SUBDIRS += $(TEST_BUDIRS)
