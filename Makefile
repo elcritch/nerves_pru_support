@@ -2,6 +2,8 @@ SRCDIRS = src
 SUBDIRS = pru/lib/rpmsg pru/lib/pru_support pru/lib/msgpack pru/lib/softspi
 TEST_SUBDIRS = test/softspi_test
 
+ARTIFACT_DIR = _build/pru
+
 ifeq ($(MIX_ENV),test)
 SUBDIRS += $(TEST_BUDIRS)
 endif
@@ -16,11 +18,11 @@ artifact: $(SUBDIRS)
 test: $(TEST_SUBDIRS)
 
 artifact_build:
-	mkdir -p _build/pru/include
-	cp -RL pru/include/* _build/pru/include/
+	mkdir -p $(ARTIFACT_DIR)/include
+	cp -RL pru/include/* $(ARTIFACT_DIR)/include/
 
 clean_artifact:
-	rm -Rf _build/pru/
+	rm -Rf $(ARTIFACT_DIR)/
 
 $(SUBDIRS): artifact_build
 	env | grep -i pru | sort
