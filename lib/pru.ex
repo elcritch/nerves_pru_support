@@ -57,13 +57,13 @@ defmodule Pru do
   def boot(pru) do
     case pru do
       0 ->
-        run "echo 'am335x-pru0-fw' > #{sysfs_pru0}/firmware"
-        run "echo 'start' > #{sysfs_pru0}/state"
+        run("echo 'am335x-pru0-fw' > #{sysfs_pru0}/firmware")
+        run("echo 'start' > #{sysfs_pru0}/state")
         {:ok}
 
       1 ->
-        run "echo 'am335x-pru1-fw' > #{sysfs_pru1}/firmware"
-        run "echo 'start' > #{sysfs_pru1}/state"
+        run("echo 'am335x-pru1-fw' > #{sysfs_pru1}/firmware")
+        run("echo 'start' > #{sysfs_pru1}/state")
         {:ok}
 
       _ ->
@@ -85,11 +85,11 @@ defmodule Pru do
   def halt(pru) do
     case pru do
       0 ->
-        run "echo 'start' > #{sysfs_pru0}/state"
+        run("echo 'start' > #{sysfs_pru0}/state")
         {:ok}
 
       1 ->
-        run "echo 'start' > #{sysfs_pru1}/state"
+        run("echo 'start' > #{sysfs_pru1}/state")
         {:ok}
 
       _ ->
