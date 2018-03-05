@@ -116,7 +116,7 @@ defmodule Pru.Port do
     {:reply, response, state}
   end
 
-  def handle_call({:close, pid}, _from, state) do
+  def handle_call({:close, _pid}, _from, state) do
     {:stop, :normal, Port.close(state.port), state}
   end
 

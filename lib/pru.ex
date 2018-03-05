@@ -1,11 +1,11 @@
 defmodule Pru do
+  require Logger
+
   @moduledoc """
   BeagleBone Black/Green PRU Helper Library
   """
 
-  # Sysfs location from kernel 4.9
-  @sysfs_pru0 "/sys/class/remoteproc/remoteproc1"
-  @sysfs_pru1 "/sys/class/remoteproc/remoteproc2"
+  defguard is_valid_pru?(pruid) when pruid >= 0 and pruid <= 1
 
   @doc """
   Loads the cape-universal and cape-univ-hdmi to maximize
@@ -20,9 +20,9 @@ defmodule Pru do
 
   """
   def init_pins do
-    :os.cmd('config-pin overlay cape-universal > /dev/null')
-    :os.cmd('config-pin overlay cape-univ-hdmi > /dev/null')
-    {:ok}
+    run("config-pin overlay cape-universal > /dev/null")
+    run("config-pin overlay cape-univ-hdmi > /dev/null")
+    :ok
   end
 
   @doc """
@@ -40,8 +40,13 @@ defmodule Pru do
   """
   def init_rpmsg do
     :os.cmd('modprobe rpmsg_pru')
-    {:ok}
+    :ok
   end
+
+  # Sysfs location from kernel 4.9
+  def sysfs_path(0), do: "/sys/class/remoteproc/remoteproc1"
+  def sysfs_path(1), do: "/sys/class/remoteproc/remoteproc2"
+  def sysfs_path(id), do: raise("Unknown PRU: #{inspect(id)}")
 
   @doc """
   Boots the specified PRU core.
@@ -54,22 +59,13 @@ defmodule Pru do
   :ok
 
   """
-  def boot(pru) do
-    case pru do
-      0 ->
-        run("echo 'am335x-pru0-fw' > #{sysfs_pru0}/firmware")
-        run("echo 'start' > #{sysfs_pru0}/state")
-        {:ok}
-
-      1 ->
-        run("echo 'am335x-pru1-fw' > #{sysfs_pru1}/firmware")
-        run("echo 'start' > #{sysfs_pru1}/state")
-        {:ok}
-
-      _ ->
-        {:error}
-    end
+  def boot(pru) when is_valid_pru?(pru) do
+    run("echo 'am335x-pru#{pru}-fw' > #{sysfs_path(pru)}/firmware")
+    run("echo 'start' > #{sysfs_path(pru)}/state")
+    :ok
   end
+
+  def boot(pru), do: raise("Unknown PRU: #{inspect(pru)}")
 
   @doc """
   Halts the specified PRU core.
@@ -82,20 +78,12 @@ defmodule Pru do
   :ok
 
   """
-  def halt(pru) do
-    case pru do
-      0 ->
-        run("echo 'start' > #{sysfs_pru0}/state")
-        {:ok}
-
-      1 ->
-        run("echo 'start' > #{sysfs_pru1}/state")
-        {:ok}
-
-      _ ->
-        {:error}
-    end
+  def halt(pru) when is_valid_pru?(pru) do
+    run("echo 'start' > #{sysfs_path(pru)}/state")
+    :ok
   end
+
+  def halt(pru), do: raise("Unknown PRU: #{inspect(pru)}")
 
   @doc """
   Reboots the specified PRU core.
@@ -109,9 +97,9 @@ defmodule Pru do
 
   """
   def reboot(pru) do
-    halt(pru)
-    boot(pru)
-    {:ok}
+    :ok = halt(pru)
+    :ok = boot(pru)
+    :ok
   end
 
   @doc """
@@ -126,8 +114,8 @@ defmodule Pru do
 
   """
   def pin_out(pin) do
-    :os.cmd('config-pin #{pin} pruout')
-    {:ok}
+    run("config-pin #{pin} pruout")
+    :ok
   end
 
   @doc """
@@ -142,12 +130,12 @@ defmodule Pru do
 
   """
   def pin_in(pin) do
-    :os.cmd('config-pin #{pin} pruin')
-    {:ok}
+    run("config-pin #{pin} pruin")
+    :ok
   end
 
   def run(cmd) do
-    IO.puts(:os.cmd(cmd |> to_charlist))
+    Logger.info(:os.cmd(cmd |> to_charlist))
     :os.timestamp()
   end
 end
