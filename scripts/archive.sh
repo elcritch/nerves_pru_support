@@ -24,7 +24,7 @@ fi
 
 
 # Assemble the tarball for the toolchain
-TARGET_TUPLE=priv/
+TARGET_TUPLE=$INSTALL_DIR
 TAR_PATH="${TARBALL_PATH}"
 TOOLCHAIN_BASE_NAME="$(basename ${TARBALL_PATH%.*.*})/"
 
@@ -33,7 +33,7 @@ MIX_ENV=test PRU_CGT=/dev/null make clean
 make artifact
 
 # Copy build files
-mkdir -p $WORK_DIR
+mkdir -p $WORK_DIR/$INSTALL_DIR
 cp -R $INSTALL_DIR/ $WORK_DIR/$INSTALL_DIR
 
 # Create tarball in work dir
