@@ -11,7 +11,7 @@ set -x
 WORK_DIR=$1
 TARBALL_PATH=$2
 
-INSTALL_DIR=priv/
+INSTALL_DIR=_build/pru/
 
 BUILD_OS=$(uname -s)
 
@@ -30,7 +30,7 @@ TOOLCHAIN_BASE_NAME="$(basename ${TARBALL_PATH%.*.*})/"
 
 
 MIX_ENV=test PRU_CGT=/dev/null make clean
-make
+make artifact
 
 # Copy build files
 mkdir -p $WORK_DIR
